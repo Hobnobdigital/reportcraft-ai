@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { analyzeData } from "@/lib/claude";
 
 export async function POST(req: Request) {
-  const accessCode = req.headers.get("x-access-code");
-  if (accessCode !== process.env.ACCESS_CODE) {
+  const accessCode = req.headers.get("x-access-code")?.trim();
+  if (!accessCode || accessCode !== process.env.ACCESS_CODE?.trim()) {
     return NextResponse.json({ error: "Invalid access code" }, { status: 401 });
   }
 
