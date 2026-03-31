@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Download, X, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 import { AnalysisResult } from "@/lib/types";
 import { formatValue } from "@/lib/utils";
@@ -25,11 +26,11 @@ interface ReportPreviewProps {
   error?: string | null;
 }
 
-/* Vancity report: 1008x612pts landscape. We render at 1008x612 scaled to fit. */
+/* Vancity: 1008x612pts landscape. We scale to fit viewport. */
 const PW = 1008;
 const PH = 612;
 
-export function ReportPreview({ isOpen, onClose, report, analysis, isGenerating, generationStep, error }: ReportPreviewProps) {
+function ReportModal({ isOpen, onClose, report, analysis, isGenerating, generationStep, error }: ReportPreviewProps) {
   const [page, setPage] = useState(0);
   const [isExporting, setIsExporting] = useState(false);
   const pagesRef = useRef<HTMLDivElement>(null);
@@ -52,92 +53,110 @@ export function ReportPreview({ isOpen, onClose, report, analysis, isGenerating,
       for (let i = 0; i < allPages.length; i++) {
         if (i > 0) pdf.addPage([PW, PH], "landscape");
         const el = allPages[i] as HTMLElement;
+        const prev = el.style.display;
         el.style.display = "block";
         const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: "#FFFFFF", logging: false, width: PW, height: PH });
-        el.style.display = i === page ? "block" : "none";
+        el.style.display = prev;
         pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, PW, PH);
       }
       pdf.save(`${report.title.replace(/\s+/g, "-").toLowerCase()}.pdf`);
-    } catch (err) { console.error(err); }
+    } catch (err) { console.error("PDF export failed:", err); }
     setIsExporting(false);
   };
 
+  /* Scale factor to fit page in viewport */
+  const scale = typeof window !== "undefined"
+    ? Math.min((window.innerWidth - 80) / PW, (window.innerHeight - 200) / PH, 1)
+    : 0.7;
+
   return (
-    /* POPUP MODAL — centered, not full screen */
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(10,37,64,0.7)", backdropFilter: "blur(8px)" }}
-      onClick={e => { if (e.target === e.currentTarget && !isGenerating) onClose(); }}>
-
-      <div className="relative flex flex-col bg-white rounded-2xl shadow-2xl overflow-hidden animate-scaleIn"
-        style={{ width: "min(95vw, 1100px)", maxHeight: "90vh" }}>
-
-        {/* Modal header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b" style={{ borderColor: "#E3E8EE" }}>
-          <div className="flex items-center gap-3">
-            <h2 className="text-[15px] font-semibold text-[#0A2540]">
-              {isGenerating ? "Generating Report..." : report ? report.title : "Report Preview"}
-            </h2>
+    <div
+      style={{
+        position: "fixed", inset: 0, zIndex: 99999,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        backgroundColor: "rgba(10,37,64,0.75)",
+        backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+      }}
+      onClick={e => { if (e.target === e.currentTarget && !isGenerating) onClose(); }}
+    >
+      <div
+        style={{
+          display: "flex", flexDirection: "column",
+          backgroundColor: "#FFFFFF",
+          borderRadius: 16, overflow: "hidden",
+          boxShadow: "0 24px 64px rgba(10,37,64,0.25)",
+          maxWidth: "95vw", maxHeight: "95vh",
+          width: PW * scale + 48,
+          animation: "scaleIn 0.3s cubic-bezier(0.16,1,0.3,1) both",
+        }}
+      >
+        {/* ===== HEADER BAR ===== */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "12px 20px", borderBottom: "1px solid #E3E8EE",
+          backgroundColor: "#FFFFFF", flexShrink: 0,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontSize: 15, fontWeight: 600, color: "#0A2540" }}>
+              {isGenerating ? "Generating Report..." : report ? report.title : "Report"}
+            </span>
             {report && !isGenerating && (
-              <span className="text-[12px] text-[#8898AA] bg-[#F6F9FC] px-2 py-0.5 rounded-full">
+              <span style={{ fontSize: 12, color: "#8898AA", backgroundColor: "#F6F9FC", padding: "2px 8px", borderRadius: 99 }}>
                 Page {page + 1} / {totalPages}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             {report && !isGenerating && (
               <>
                 <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-                  className="w-8 h-8 rounded-md flex items-center justify-center text-[#425466] hover:bg-[#F6F9FC] disabled:opacity-20 transition-colors border border-[#E3E8EE]">
+                  style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid #E3E8EE", background: "white", color: page === 0 ? "#E3E8EE" : "#425466", cursor: page === 0 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <ChevronLeft size={16} />
                 </button>
                 <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}
-                  className="w-8 h-8 rounded-md flex items-center justify-center text-[#425466] hover:bg-[#F6F9FC] disabled:opacity-20 transition-colors border border-[#E3E8EE]">
+                  style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid #E3E8EE", background: "white", color: page >= totalPages - 1 ? "#E3E8EE" : "#425466", cursor: page >= totalPages - 1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <ChevronRight size={16} />
                 </button>
                 <button onClick={handleDownload} disabled={isExporting}
-                  className="ml-2 px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2 disabled:opacity-50"
-                  style={{ backgroundColor: "#635BFF" }}>
+                  style={{ marginLeft: 8, padding: "8px 16px", borderRadius: 8, backgroundColor: "#635BFF", color: "white", border: "none", fontSize: 13, fontWeight: 600, cursor: isExporting ? "wait" : "pointer", display: "flex", alignItems: "center", gap: 6, opacity: isExporting ? 0.6 : 1 }}>
                   <Download size={14} />{isExporting ? "Exporting..." : "Download PDF"}
                 </button>
               </>
             )}
-            <button onClick={onClose} className="w-8 h-8 rounded-md flex items-center justify-center text-[#8898AA] hover:text-[#0A2540] hover:bg-[#F6F9FC] transition-colors ml-1">
-              <X size={18} />
+            <button onClick={onClose}
+              style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid #E3E8EE", background: "white", color: "#8898AA", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginLeft: 4 }}>
+              <X size={16} />
             </button>
           </div>
         </div>
 
-        {/* Modal body */}
-        <div className="flex-1 overflow-auto flex items-center justify-center p-6" style={{ backgroundColor: "#F0F3F7" }}>
+        {/* ===== CONTENT ===== */}
+        <div style={{ flex: 1, overflow: "auto", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "#F0F3F7" }}>
 
           {/* LOADING */}
           {isGenerating && (
-            <div className="text-center py-16">
-              <div className="relative w-16 h-16 mx-auto mb-6">
-                <div className="absolute inset-0 rounded-full border-[3px] border-[#E3E8EE]" />
-                <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-[#635BFF] animate-spin" />
-              </div>
-              <h3 className="text-lg font-semibold text-[#0A2540] mb-2">Creating your report</h3>
-              <p className="text-sm text-[#425466]">{generationStep || "Preparing..."}</p>
-              <p className="text-xs text-[#8898AA] mt-4">This usually takes 15-30 seconds</p>
+            <div style={{ textAlign: "center", padding: "64px 0" }}>
+              <div style={{ width: 48, height: 48, margin: "0 auto 20px", border: "3px solid #E3E8EE", borderTop: "3px solid #635BFF", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+              <p style={{ fontSize: 16, fontWeight: 600, color: "#0A2540", marginBottom: 8 }}>Creating your report</p>
+              <p style={{ fontSize: 14, color: "#425466" }}>{generationStep || "Preparing..."}</p>
+              <p style={{ fontSize: 12, color: "#8898AA", marginTop: 16 }}>This usually takes 20-40 seconds</p>
             </div>
           )}
 
           {/* ERROR */}
           {error && !isGenerating && (
-            <div className="text-center py-16">
-              <AlertCircle size={40} className="mx-auto mb-4 text-[#DF1B41]" />
-              <h3 className="text-lg font-semibold text-[#0A2540] mb-2">Generation failed</h3>
-              <p className="text-sm text-[#425466] mb-6 max-w-md">{error}</p>
-              <button onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-medium text-[#425466] border border-[#E3E8EE] hover:bg-white transition-colors">
-                Close
-              </button>
+            <div style={{ textAlign: "center", padding: "64px 0" }}>
+              <AlertCircle size={40} style={{ color: "#DF1B41", margin: "0 auto 16px", display: "block" }} />
+              <p style={{ fontSize: 16, fontWeight: 600, color: "#0A2540", marginBottom: 8 }}>Generation failed</p>
+              <p style={{ fontSize: 14, color: "#425466", maxWidth: 400, margin: "0 auto 24px" }}>{error}</p>
+              <button onClick={onClose} style={{ padding: "8px 20px", borderRadius: 8, border: "1px solid #E3E8EE", background: "white", color: "#425466", fontSize: 13, fontWeight: 500, cursor: "pointer" }}>Close</button>
             </div>
           )}
 
-          {/* REPORT PAGES — Vancity-exact layout */}
+          {/* REPORT PAGES */}
           {report && !isGenerating && !error && (
-            <div ref={pagesRef}>
+            <div ref={pagesRef} style={{ transform: `scale(${scale})`, transformOrigin: "top center" }}>
               {[...Array(totalPages)].map((_, idx) => (
                 <div key={idx} data-page
                   style={{
@@ -145,28 +164,20 @@ export function ReportPreview({ isOpen, onClose, report, analysis, isGenerating,
                     display: idx === page ? "block" : "none",
                     fontFamily: '"Geist", "Helvetica Neue", sans-serif',
                     boxShadow: "0 4px 24px rgba(10,37,64,0.12)",
-                    overflow: "hidden",
-                    position: "relative",
-                    backgroundColor: "#FFFFFF",
+                    overflow: "hidden", position: "relative", backgroundColor: "#FFFFFF",
                   }}>
 
-                  {/* ========== PAGE 1: COVER (matches Vancity p1) ========== */}
+                  {/* PAGE 1: COVER */}
                   {idx === 0 && (
                     <div style={{ width: "100%", height: "100%", backgroundColor: "#0A2540", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "60px 72px" }}>
-                      {/* Top: brand mark */}
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                         <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, #635BFF, #00D4AA)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 14, fontWeight: 700 }}>R</div>
                         <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, fontWeight: 500 }}>ReportCraft AI</span>
                       </div>
-                      {/* Bottom: title block — Vancity style: large title bottom-left */}
                       <div>
                         <div style={{ width: 64, height: 4, backgroundColor: "#635BFF", marginBottom: 32, borderRadius: 2 }} />
-                        <h1 style={{ fontSize: 48, fontWeight: 800, color: "#FFFFFF", lineHeight: 1.05, letterSpacing: "-0.03em", marginBottom: 12 }}>
-                          {report.title}
-                        </h1>
-                        <p style={{ fontSize: 18, color: "rgba(255,255,255,0.5)", lineHeight: 1.4, marginBottom: 40 }}>
-                          {report.subtitle}
-                        </p>
+                        <h1 style={{ fontSize: 48, fontWeight: 800, color: "#FFFFFF", lineHeight: 1.05, letterSpacing: "-0.03em", marginBottom: 12 }}>{report.title}</h1>
+                        <p style={{ fontSize: 18, color: "rgba(255,255,255,0.5)", lineHeight: 1.4, marginBottom: 40 }}>{report.subtitle}</p>
                         <div style={{ display: "flex", gap: 32, fontSize: 13, color: "rgba(255,255,255,0.3)" }}>
                           <span>{report.date}</span>
                           <span>Prepared by ReportCraft AI</span>
@@ -175,18 +186,14 @@ export function ReportPreview({ isOpen, onClose, report, analysis, isGenerating,
                     </div>
                   )}
 
-                  {/* ========== PAGE 2: EXECUTIVE SUMMARY (matches Vancity p5-6 layout) ========== */}
+                  {/* PAGE 2: EXECUTIVE SUMMARY */}
                   {idx === 1 && (
                     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", padding: "48px 72px" }}>
-                      {/* Header strip */}
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #E3E8EE", paddingBottom: 12, marginBottom: 32 }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#8898AA" }}>Executive Summary</span>
-                        <span style={{ fontSize: 10, color: "#8898AA" }}>ReportCraft AI &middot; {report.date}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8898AA" }}>Executive Summary</span>
+                        <span style={{ fontSize: 10, color: "#8898AA" }}>ReportCraft AI</span>
                       </div>
-
-                      {/* Two-column layout like Vancity */}
                       <div style={{ display: "flex", gap: 48, flex: 1 }}>
-                        {/* Left column: narrative */}
                         <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 24 }}>
                           <div>
                             <div style={{ width: 4, height: 24, backgroundColor: "#635BFF", borderRadius: 2, marginBottom: 12 }} />
@@ -194,39 +201,34 @@ export function ReportPreview({ isOpen, onClose, report, analysis, isGenerating,
                             <p style={{ fontSize: 13, lineHeight: 1.7, color: "#425466" }}>{report.executiveSummary.overview}</p>
                           </div>
                           <div>
-                            <h3 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#635BFF", marginBottom: 8 }}>Key Findings</h3>
+                            <h3 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#635BFF", marginBottom: 8 }}>Key Findings</h3>
                             <p style={{ fontSize: 13, lineHeight: 1.7, color: "#425466" }}>{report.executiveSummary.keyFindings}</p>
                           </div>
                           <div>
-                            <h3 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#635BFF", marginBottom: 8 }}>Recommendations</h3>
+                            <h3 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#635BFF", marginBottom: 8 }}>Recommendations</h3>
                             <p style={{ fontSize: 13, lineHeight: 1.7, color: "#425466" }}>{report.executiveSummary.recommendations}</p>
                           </div>
                         </div>
-
-                        {/* Right column: KPI cards — Vancity "highlights" style */}
                         <div style={{ width: 240, display: "flex", flexDirection: "column", gap: 12 }}>
-                          <h3 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#0A2540", marginBottom: 4 }}>Key Metrics</h3>
+                          <h3 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#0A2540", marginBottom: 4 }}>Key Metrics</h3>
                           {analysis.kpis.slice(0, 4).map((kpi, i) => (
                             <div key={i} style={{ padding: "14px 16px", borderRadius: 10, backgroundColor: "#F6F9FC", border: "1px solid #E3E8EE" }}>
-                              <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#8898AA", marginBottom: 4 }}>{kpi.label}</p>
+                              <p style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8898AA", marginBottom: 4 }}>{kpi.label}</p>
                               <p style={{ fontSize: 24, fontWeight: 800, color: "#0A2540", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.02em" }}>{formatValue(kpi.value, kpi.format)}</p>
                               <p style={{ fontSize: 11, color: kpi.trend === "up" ? "#0E6245" : "#DF1B41", marginTop: 4, fontWeight: 600 }}>
-                                {kpi.trend === "up" ? "\u2191" : "\u2193"} {kpi.trendValue.toFixed(1)}% vs last period
+                                {kpi.trend === "up" ? "\u2191" : "\u2193"} {kpi.trendValue.toFixed(1)}%
                               </p>
                             </div>
                           ))}
                         </div>
                       </div>
-
-                      {/* Footer */}
                       <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #E3E8EE", paddingTop: 12, marginTop: 16, fontSize: 10, color: "#8898AA" }}>
-                        <span>{report.date}</span>
-                        <span>Page 2</span>
+                        <span>{report.date}</span><span>Page 2</span>
                       </div>
                     </div>
                   )}
 
-                  {/* ========== PAGE 3: FULL-BLEED IMAGE (Vancity section divider) ========== */}
+                  {/* PAGE 3: FULL-BLEED IMAGE (if available) */}
                   {idx === 2 && hasImage && (
                     <div style={{ width: "100%", height: "100%", position: "relative" }}>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -238,33 +240,29 @@ export function ReportPreview({ isOpen, onClose, report, analysis, isGenerating,
                           {report.keyTakeaways[0] || "Data-driven decisions for sustainable growth"}
                         </p>
                       </div>
-                      {/* Page number bottom right */}
                       <div style={{ position: "absolute", bottom: 24, right: 48, fontSize: 10, color: "rgba(255,255,255,0.5)" }}>Page 3</div>
                     </div>
                   )}
 
-                  {/* ========== PAGE 4: DETAILED ANALYSIS (Vancity "Business Review" style) ========== */}
+                  {/* PAGE 4: DETAILED ANALYSIS */}
                   {idx === (hasImage ? 3 : 2) && (
                     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", padding: "48px 72px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #E3E8EE", paddingBottom: 12, marginBottom: 32 }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#8898AA" }}>Detailed Analysis</span>
-                        <span style={{ fontSize: 10, color: "#8898AA" }}>ReportCraft AI &middot; {report.date}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8898AA" }}>Detailed Analysis</span>
+                        <span style={{ fontSize: 10, color: "#8898AA" }}>ReportCraft AI</span>
                       </div>
-
                       <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 28 }}>
                         {analysis.charts.slice(0, 3).map((chart, i) => (
                           <div key={i} style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
-                            <div style={{ width: 4, height: "100%", minHeight: 40, backgroundColor: i === 0 ? "#635BFF" : i === 1 ? "#00D4AA" : "#0073E6", borderRadius: 2, flexShrink: 0 }} />
+                            <div style={{ width: 4, minHeight: 40, backgroundColor: ["#635BFF", "#00D4AA", "#0073E6"][i], borderRadius: 2, flexShrink: 0 }} />
                             <div style={{ flex: 1 }}>
                               <h3 style={{ fontSize: 16, fontWeight: 700, color: "#0A2540", marginBottom: 6, letterSpacing: "-0.01em" }}>{chart.title}</h3>
                               <p style={{ fontSize: 13, lineHeight: 1.7, color: "#425466" }}>{report.chartCaptions[i] || ""}</p>
                             </div>
                           </div>
                         ))}
-
-                        {/* Key Takeaways — Vancity-style numbered list */}
                         <div style={{ marginTop: 8, paddingTop: 24, borderTop: "1px solid #E3E8EE" }}>
-                          <h3 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" as const, color: "#0A2540", marginBottom: 16 }}>Key Takeaways</h3>
+                          <h3 style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "#0A2540", marginBottom: 16 }}>Key Takeaways</h3>
                           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                             {report.keyTakeaways.map((t, i) => (
                               <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
@@ -275,29 +273,26 @@ export function ReportPreview({ isOpen, onClose, report, analysis, isGenerating,
                           </div>
                         </div>
                       </div>
-
                       <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #E3E8EE", paddingTop: 12, marginTop: 16, fontSize: 10, color: "#8898AA" }}>
-                        <span>{report.date}</span>
-                        <span>Page {hasImage ? 4 : 3}</span>
+                        <span>{report.date}</span><span>Page {hasImage ? 4 : 3}</span>
                       </div>
                     </div>
                   )}
 
-                  {/* ========== LAST PAGE: DATA APPENDIX (Vancity table style) ========== */}
+                  {/* LAST PAGE: DATA APPENDIX */}
                   {idx === totalPages - 1 && idx > (hasImage ? 3 : 2) && (
                     <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", padding: "48px 72px" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #E3E8EE", paddingBottom: 12, marginBottom: 24 }}>
-                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "#8898AA" }}>Data Appendix</span>
-                        <span style={{ fontSize: 10, color: "#8898AA" }}>ReportCraft AI &middot; {report.date}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "#8898AA" }}>Data Appendix</span>
+                        <span style={{ fontSize: 10, color: "#8898AA" }}>ReportCraft AI</span>
                       </div>
-
                       {analysis.charts[0]?.data[0] && (
                         <div style={{ flex: 1, overflow: "hidden" }}>
                           <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
                             <thead>
                               <tr style={{ borderBottom: "2px solid #0A2540" }}>
                                 {Object.keys(analysis.charts[0].data[0]).slice(0, 7).map(col => (
-                                  <th key={col} style={{ padding: "8px 12px 8px 0", fontSize: 10, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.06em", color: "#0A2540" }}>{String(col)}</th>
+                                  <th key={col} style={{ padding: "8px 12px 8px 0", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "#0A2540" }}>{String(col)}</th>
                                 ))}
                               </tr>
                             </thead>
@@ -315,10 +310,8 @@ export function ReportPreview({ isOpen, onClose, report, analysis, isGenerating,
                           </table>
                         </div>
                       )}
-
                       <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px solid #E3E8EE", paddingTop: 12, marginTop: 16, fontSize: 10, color: "#8898AA" }}>
-                        <span>{report.date}</span>
-                        <span>Page {totalPages}</span>
+                        <span>{report.date}</span><span>Page {totalPages}</span>
                       </div>
                     </div>
                   )}
@@ -328,17 +321,26 @@ export function ReportPreview({ isOpen, onClose, report, analysis, isGenerating,
           )}
         </div>
 
-        {/* Page dots at bottom of modal */}
+        {/* PAGE DOTS FOOTER */}
         {report && !isGenerating && !error && (
-          <div className="flex justify-center py-3 gap-2 border-t" style={{ borderColor: "#E3E8EE", backgroundColor: "#F6F9FC" }}>
+          <div style={{ display: "flex", justifyContent: "center", padding: "12px 0", gap: 8, borderTop: "1px solid #E3E8EE", backgroundColor: "#F6F9FC", flexShrink: 0 }}>
             {[...Array(totalPages)].map((_, i) => (
               <button key={i} onClick={() => setPage(i)}
-                className="h-2 rounded-full transition-all duration-300"
-                style={{ width: i === page ? 24 : 8, backgroundColor: i === page ? "#635BFF" : "#E3E8EE" }} />
+                style={{ height: 8, borderRadius: 4, border: "none", cursor: "pointer", transition: "all 0.3s", width: i === page ? 24 : 8, backgroundColor: i === page ? "#635BFF" : "#E3E8EE" }} />
             ))}
           </div>
         )}
       </div>
     </div>
   );
+}
+
+/* Use portal to render on document.body — escapes all stacking contexts */
+export function ReportPreview(props: ReportPreviewProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
+  if (!mounted || !props.isOpen) return null;
+
+  return createPortal(<ReportModal {...props} />, document.body);
 }
