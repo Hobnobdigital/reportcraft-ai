@@ -4,10 +4,10 @@ import { BarChart3, Filter, PieChart } from "lucide-react";
 import { templates } from "@/lib/templates";
 import { ParsedData } from "@/lib/types";
 
-const iconMap: Record<string, React.ReactNode> = {
-  BarChart3: <BarChart3 className="w-5 h-5" />,
-  Filter: <Filter className="w-5 h-5" />,
-  PieChart: <PieChart className="w-5 h-5" />,
+const iconMap: Record<string, React.ElementType> = {
+  BarChart3,
+  Filter,
+  PieChart,
 };
 
 interface TemplateSelectorProps {
@@ -17,62 +17,48 @@ interface TemplateSelectorProps {
 
 export function TemplateSelector({ onSelect, activeTemplate }: TemplateSelectorProps) {
   return (
-    <div className="space-y-3">
-      <h3
-        className="overline px-1"
-        style={{ color: "var(--text-tertiary)" }}
-      >
-        Templates
-      </h3>
-      {templates.map((template) => (
-        <button
-          key={template.id}
-          onClick={() =>
-            onSelect(
-              { data: template.data as Record<string, unknown>[], columns: template.columns },
-              template.id
-            )
-          }
-          className="w-full text-left p-4 rounded-xl border transition-all duration-200"
-          style={{
-            borderColor:
-              activeTemplate === template.id
-                ? "var(--accent-primary)"
-                : "var(--border-primary)",
-            backgroundColor:
-              activeTemplate === template.id
-                ? "var(--accent-primary-subtle)"
-                : "var(--bg-elevated)",
-            boxShadow: activeTemplate === template.id ? "var(--shadow-sm)" : "none",
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <div
-              className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{
-                backgroundColor: "var(--accent-primary-subtle)",
-                color: "var(--accent-primary)",
-              }}
+    <div className="w-full flex flex-col">
+      <span className="overline text-[#8898AA] mb-3 px-1">Templates</span>
+
+      <div className="flex flex-col gap-2.5">
+        {templates.map((template) => {
+          const isActive = activeTemplate === template.id;
+          const Icon = iconMap[template.icon] || BarChart3;
+
+          return (
+            <button
+              key={template.id}
+              onClick={() =>
+                onSelect(
+                  { data: template.data as Record<string, unknown>[], columns: template.columns },
+                  template.id
+                )
+              }
+              className={`
+                w-full text-left p-4 rounded-xl border flex items-start gap-3.5
+                transition-all duration-200
+                ${isActive
+                  ? "border-[#635BFF] bg-[rgba(99,91,255,0.08)] shadow-sm"
+                  : "border-[#E3E8EE] bg-white hover:-translate-y-px hover:shadow-md hover:border-[#D3D9E2]"
+                }
+              `}
             >
-              {iconMap[template.icon]}
-            </div>
-            <div className="min-w-0">
-              <p
-                className="text-sm font-medium mb-0.5"
-                style={{ color: "var(--text-primary)" }}
-              >
-                {template.name}
-              </p>
-              <p
-                className="text-xs leading-relaxed"
-                style={{ color: "var(--text-tertiary)" }}
-              >
-                {template.description}
-              </p>
-            </div>
-          </div>
-        </button>
-      ))}
+              <div className="w-9 h-9 shrink-0 rounded-lg flex items-center justify-center bg-[rgba(99,91,255,0.08)] text-[#635BFF]">
+                <Icon size={18} strokeWidth={2.5} />
+              </div>
+
+              <div className="flex flex-col gap-1 pt-0.5 min-w-0">
+                <span className="text-sm font-medium text-[#0A2540] leading-none">
+                  {template.name}
+                </span>
+                <span className="text-xs text-[#8898AA] leading-relaxed">
+                  {template.description}
+                </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

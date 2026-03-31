@@ -7,6 +7,8 @@ export interface KPI {
   sparklineData: number[];
 }
 
+export type ChartType = "bar" | "line" | "area" | "pie" | "donut" | "radar" | "3d-bar" | "3d-scatter";
+
 export interface ChartConfig {
   type: "bar" | "line" | "area" | "pie" | "composed";
   title: string;
@@ -14,6 +16,7 @@ export interface ChartConfig {
   yKeys: string[];
   colors: string[];
   data: Record<string, unknown>[];
+  insight?: string;
 }
 
 export interface AnalysisResult {
@@ -36,6 +39,8 @@ export interface Template {
   columns: string[];
 }
 
+export type LayoutPreset = "executive" | "deep-dive" | "presentation" | "custom";
+
 export interface DashboardState {
   parsedData: ParsedData | null;
   analysis: AnalysisResult | null;
@@ -45,4 +50,13 @@ export interface DashboardState {
   error: string | null;
   activeTemplate: string | null;
   fileName: string | null;
+  layout: LayoutPreset;
+}
+
+export interface ExportOptions {
+  title: string;
+  includeCover: boolean;
+  includeSummary: boolean;
+  includeCharts: boolean;
+  includeAppendix: boolean;
 }

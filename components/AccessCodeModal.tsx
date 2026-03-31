@@ -14,6 +14,7 @@ export function AccessCodeModal() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!code.trim()) return;
     setError("");
     setIsValidating(true);
 
@@ -41,73 +42,77 @@ export function AccessCodeModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{
+        backgroundColor: "rgba(10, 37, 64, 0.6)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+      }}
+      role="dialog"
+      aria-modal="true"
+    >
       <div
-        className="absolute inset-0"
-        style={{
-          backgroundColor: "rgba(10, 37, 64, 0.6)",
-          backdropFilter: "blur(8px)",
-          WebkitBackdropFilter: "blur(8px)",
-        }}
-      />
-      <div
-        className="relative w-full max-w-md mx-4 p-8 bg-[var(--bg-primary)] border border-[var(--border-primary)] animate-scaleIn"
+        className="relative w-full max-w-md bg-white animate-scaleIn overflow-hidden"
         style={{
           borderRadius: "var(--radius-xl)",
+          border: "1px solid #E3E8EE",
           boxShadow: "var(--shadow-xl)",
         }}
       >
-        <div className="flex flex-col items-center text-center mb-6">
+        <div className="p-8">
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-            style={{ backgroundColor: "var(--accent-primary-subtle)" }}
+            className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
+            style={{ backgroundColor: "rgba(99, 91, 255, 0.08)" }}
           >
-            <Lock className="w-5 h-5" style={{ color: "var(--accent-primary)" }} />
+            <Lock size={22} color="#635BFF" strokeWidth={2} />
           </div>
-          <h2
-            className="text-xl font-semibold mb-2"
-            style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}
-          >
+
+          <h2 className="text-xl font-semibold text-[#0A2540] mb-2 tracking-tight">
             Enter access code
           </h2>
-          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-sm text-[#425466] mb-6 leading-relaxed">
             Enter your access code to use AI-powered features.
           </p>
-        </div>
 
-        <form onSubmit={handleSubmit}>
-          <input
-            type="password"
-            value={code}
-            onChange={(e) => {
-              setCode(e.target.value);
-              setError("");
-            }}
-            placeholder="Enter access code"
-            className="w-full px-4 py-3 text-sm border transition-all duration-150"
-            style={{
-              borderRadius: "var(--radius-md)",
-              borderColor: error ? "var(--error)" : "var(--border-primary)",
-              backgroundColor: "var(--bg-primary)",
-              color: "var(--text-primary)",
-              height: 44,
-            }}
-            autoFocus
-          />
-          {error && (
-            <p className="mt-2 text-xs" style={{ color: "var(--error)" }}>
-              {error}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={!code || isValidating}
-            className="btn-primary w-full mt-4 py-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-          >
-            {isValidating ? "Validating..." : "Continue"}
-            {!isValidating && <ArrowRight className="w-4 h-4" />}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="password"
+              value={code}
+              onChange={(e) => {
+                setCode(e.target.value);
+                setError("");
+              }}
+              placeholder="Enter access code"
+              className="w-full px-4 py-3 text-sm text-[#0A2540] bg-white transition-all duration-150"
+              style={{
+                height: 44,
+                borderRadius: "var(--radius-md)",
+                border: `1px solid ${error ? "#DF1B41" : "#E3E8EE"}`,
+              }}
+              autoFocus
+            />
+            {error && (
+              <p className="mt-2 text-xs text-[#DF1B41] font-medium">
+                {error}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={!code.trim() || isValidating}
+              className="btn-primary w-full mt-4 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isValidating ? (
+                "Validating..."
+              ) : (
+                <>
+                  Continue
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

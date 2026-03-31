@@ -8,7 +8,6 @@ import "@fontsource/geist-sans/800.css";
 import "@fontsource/geist-mono/400.css";
 import "@fontsource/geist-mono/700.css";
 import "./globals.css";
-import { ThemeProvider } from "@/components/ThemeProvider";
 import { AccessCodeProvider } from "@/components/AccessCodeProvider";
 import { AccessCodeModal } from "@/components/AccessCodeModal";
 import { Navbar } from "@/components/Navbar";
@@ -31,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <link
           rel="icon"
@@ -39,18 +38,11 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <AccessCodeProvider>
-            <Navbar />
-            <main>{children}</main>
-            <AccessCodeModal />
-          </AccessCodeProvider>
-        </ThemeProvider>
+        <AccessCodeProvider>
+          <Navbar />
+          <main>{children}</main>
+          <AccessCodeModal />
+        </AccessCodeProvider>
       </body>
     </html>
   );
