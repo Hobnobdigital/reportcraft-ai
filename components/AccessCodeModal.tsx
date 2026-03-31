@@ -21,19 +21,14 @@ export function AccessCodeModal() {
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-access-code": code,
-        },
+        headers: { "Content-Type": "application/json", "x-access-code": code },
         body: JSON.stringify({ data: [], columns: [], validate: true }),
       });
-
       if (res.status === 401) {
         setError("Invalid access code. Please try again.");
         setIsValidating(false);
         return;
       }
-
       setAccessCode(code);
     } catch {
       setAccessCode(code);
@@ -44,72 +39,42 @@ export function AccessCodeModal() {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{
-        backgroundColor: "rgba(10, 37, 64, 0.6)",
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-      }}
-      role="dialog"
-      aria-modal="true"
+      style={{ backgroundColor: "rgba(5,5,16,0.8)", backdropFilter: "blur(12px)" }}
     >
       <div
-        className="relative w-full max-w-md bg-white animate-scaleIn overflow-hidden"
-        style={{
-          borderRadius: "var(--radius-xl)",
-          border: "1px solid #E3E8EE",
-          boxShadow: "var(--shadow-xl)",
-        }}
+        className="glass-panel relative w-full max-w-md overflow-hidden"
+        style={{ animation: "scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both" }}
       >
         <div className="p-8">
-          <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center mb-6"
-            style={{ backgroundColor: "rgba(99, 91, 255, 0.08)" }}
-          >
-            <Lock size={22} color="#635BFF" strokeWidth={2} />
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 bg-white/5 border border-white/10">
+            <Lock size={22} className="text-[#635BFF]" />
           </div>
-
-          <h2 className="text-xl font-semibold text-[#0A2540] mb-2 tracking-tight">
+          <h2 className="text-xl font-semibold text-white mb-2 tracking-tight">
             Enter access code
           </h2>
-          <p className="text-sm text-[#425466] mb-6 leading-relaxed">
+          <p className="text-sm text-white/50 mb-6 leading-relaxed">
             Enter your access code to use AI-powered features.
           </p>
-
           <form onSubmit={handleSubmit}>
             <input
               type="password"
               value={code}
-              onChange={(e) => {
-                setCode(e.target.value);
-                setError("");
-              }}
+              onChange={(e) => { setCode(e.target.value); setError(""); }}
               placeholder="Enter access code"
-              className="w-full px-4 py-3 text-sm text-[#0A2540] bg-white transition-all duration-150"
+              className="w-full px-4 py-3 text-sm text-white bg-white/5 rounded-lg transition-all duration-200"
               style={{
                 height: 44,
-                borderRadius: "var(--radius-md)",
-                border: `1px solid ${error ? "#DF1B41" : "#E3E8EE"}`,
+                border: `1px solid ${error ? "#DF1B41" : "rgba(255,255,255,0.1)"}`,
               }}
               autoFocus
             />
-            {error && (
-              <p className="mt-2 text-xs text-[#DF1B41] font-medium">
-                {error}
-              </p>
-            )}
+            {error && <p className="mt-2 text-xs text-[#DF1B41] font-medium">{error}</p>}
             <button
               type="submit"
               disabled={!code.trim() || isValidating}
-              className="btn-primary w-full mt-4 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full mt-4 py-3 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              {isValidating ? (
-                "Validating..."
-              ) : (
-                <>
-                  Continue
-                  <ArrowRight size={16} />
-                </>
-              )}
+              {isValidating ? "Validating..." : <><span>Continue</span><ArrowRight size={16} /></>}
             </button>
           </form>
         </div>

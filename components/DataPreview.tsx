@@ -15,55 +15,31 @@ export function DataPreview({ data, onDataChange }: DataPreviewProps) {
   const previewRows = data.data.slice(0, 10);
 
   useEffect(() => {
-    if (editingCell && inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.select();
-    }
+    if (editingCell && inputRef.current) { inputRef.current.focus(); inputRef.current.select(); }
   }, [editingCell]);
 
-  const handleDoubleClick = (rowIndex: number, col: string, value: unknown) => {
-    if (!onDataChange) return;
-    setEditingCell({ row: rowIndex, col });
-    setEditValue(value != null ? String(value) : "");
-  };
-
   const handleSave = useCallback(() => {
-    if (!editingCell || !onDataChange) {
-      setEditingCell(null);
-      return;
-    }
-    const { row, col } = editingCell;
+    if (!editingCell || !onDataChange) { setEditingCell(null); return; }
     const newData = [...data.data];
-    newData[row] = { ...newData[row], [col]: editValue };
+    newData[editingCell.row] = { ...newData[editingCell.row], [editingCell.col]: editValue };
     onDataChange({ ...data, data: newData });
     setEditingCell(null);
   }, [editingCell, editValue, data, onDataChange]);
 
   return (
-    <div className="w-full animate-fadeUp">
+    <div className="w-full" style={{ animation: "fadeUp 0.7s cubic-bezier(0.16,1,0.3,1) both" }}>
       <div className="flex justify-between items-end mb-3 px-1">
-        <span className="overline text-[#8898AA]">Data Preview</span>
-        <span className="text-xs text-[#8898AA]" style={{ fontVariantNumeric: "tabular-nums" }}>
+        <span className="overline">Data Preview</span>
+        <span className="text-xs text-white/40" style={{ fontVariantNumeric: "tabular-nums" }}>
           {data.data.length} rows &middot; {data.columns.length} columns
         </span>
       </div>
-
-      <div
-        className="rounded-lg overflow-x-auto bg-white"
-        style={{
-          border: "1px solid #E3E8EE",
-          boxShadow: "0 2px 5px -1px rgba(50,50,93,0.05), 0 1px 3px -1px rgba(0,0,0,0.03)",
-        }}
-      >
+      <div className="glass-panel rounded-xl overflow-x-auto">
         <table className="w-full border-collapse text-left whitespace-nowrap">
           <thead>
             <tr>
               {data.columns.map((col) => (
-                <th
-                  key={col}
-                  className="px-3 py-2 text-xs font-semibold text-[#425466] bg-[#F6F9FC] tracking-tight"
-                  style={{ borderBottom: "1px solid #E3E8EE" }}
-                >
+                <th key={col} className="px-3 py-2.5 text-[11px] font-semibold text-white/50 uppercase tracking-wider bg-white/[0.02] border-b border-white/5">
                   {col}
                 </th>
               ))}
@@ -71,40 +47,21 @@ export function DataPreview({ data, onDataChange }: DataPreviewProps) {
           </thead>
           <tbody>
             {previewRows.map((row, i) => (
-              <tr
-                key={i}
-                className="transition-colors duration-150"
-                style={{
-                  backgroundColor: i % 2 === 0 ? "#FFFFFF" : "#F6F9FC",
-                  borderBottom: i < previewRows.length - 1 ? "1px solid #F0F3F7" : "none",
-                }}
-              >
+              <tr key={i} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
                 {data.columns.map((col) => {
                   const isEditing = editingCell?.row === i && editingCell?.col === col;
                   return (
-                    <td
-                      key={col}
-                      className="p-0 text-xs text-[#0A2540] relative"
-                      style={{ fontVariantNumeric: "tabular-nums" }}
-                      onDoubleClick={() => handleDoubleClick(i, col, row[col])}
+                    <td key={col} className="p-0 text-[13px] text-white/80 relative" style={{ fontVariantNumeric: "tabular-nums" }}
+                      onDoubleClick={() => { if (onDataChange) { setEditingCell({ row: i, col }); setEditValue(row[col] != null ? String(row[col]) : ""); } }}
                     >
                       {isEditing ? (
-                        <input
-                          ref={inputRef}
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          onBlur={handleSave}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") handleSave();
-                            if (e.key === "Escape") setEditingCell(null);
-                          }}
-                          className="w-full px-3 py-2 text-xs text-[#0A2540] bg-white outline-none"
+                        <input ref={inputRef} value={editValue} onChange={(e) => setEditValue(e.target.value)} onBlur={handleSave}
+                          onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") setEditingCell(null); }}
+                          className="w-full px-3 py-2 text-[13px] text-white bg-transparent outline-none"
                           style={{ boxShadow: "inset 0 0 0 2px #635BFF" }}
                         />
                       ) : (
-                        <div className="px-3 py-2 truncate max-w-[280px] cursor-default">
-                          {String(row[col] ?? "")}
-                        </div>
+                        <div className="px-3 py-2 truncate max-w-[280px] cursor-default">{String(row[col] ?? "")}</div>
                       )}
                     </td>
                   );
@@ -114,12 +71,7 @@ export function DataPreview({ data, onDataChange }: DataPreviewProps) {
           </tbody>
         </table>
       </div>
-
-      {data.data.length > 10 && (
-        <p className="text-xs mt-3 text-center text-[#8898AA]" style={{ fontVariantNumeric: "tabular-nums" }}>
-          Showing 10 of {data.data.length} rows
-        </p>
-      )}
+      {data.data.length > 10 && <p className="text-xs mt-3 text-center text-white/30" style={{ fontVariantNumeric: "tabular-nums" }}>Showing 10 of {data.data.length} rows</p>}
     </div>
   );
 }
