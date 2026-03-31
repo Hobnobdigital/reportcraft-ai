@@ -1,0 +1,330 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Typography */
+  --font-size-hero: clamp(3rem, 5vw, 4.5rem);
+  --font-size-h1: clamp(2rem, 3.5vw, 3rem);
+  --font-size-h2: clamp(1.5rem, 2.5vw, 2rem);
+  --font-size-h3: 1.25rem;
+  --font-size-body: 1rem;
+  --font-size-body-sm: 0.875rem;
+  --font-size-caption: 0.75rem;
+  --font-size-overline: 0.6875rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
+  --space-9: 4rem;
+  --space-10: 5rem;
+  --space-11: 6rem;
+  --space-12: 8rem;
+
+  /* Layout */
+  --max-width-content: 1280px;
+  --max-width-text: 680px;
+  --max-width-wide: 1440px;
+  --section-padding-y: clamp(4rem, 8vw, 8rem);
+  --section-padding-x: clamp(1.5rem, 4vw, 4rem);
+
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(10, 37, 64, 0.04);
+  --shadow-sm: 0 2px 4px rgba(10, 37, 64, 0.06), 0 1px 2px rgba(10, 37, 64, 0.04);
+  --shadow-md: 0 4px 8px rgba(10, 37, 64, 0.08), 0 2px 4px rgba(10, 37, 64, 0.04);
+  --shadow-lg: 0 8px 16px rgba(10, 37, 64, 0.08), 0 4px 8px rgba(10, 37, 64, 0.04);
+  --shadow-xl: 0 16px 32px rgba(10, 37, 64, 0.10), 0 8px 16px rgba(10, 37, 64, 0.06);
+
+  /* Timing */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  /* Gradients */
+  --gradient-hero: linear-gradient(135deg, #0A2540 0%, #1B3A5C 25%, #0A2540 50%, #132D4A 75%, #0A2540 100%);
+  --gradient-card: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+  --gradient-accent: linear-gradient(135deg, #635BFF 0%, #8B5CF6 100%);
+  --gradient-success: linear-gradient(135deg, #00D4AA 0%, #0E6245 100%);
+
+  /* Light mode (default) */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F6F9FC;
+  --bg-tertiary: #F0F3F7;
+  --bg-elevated: #FFFFFF;
+
+  --text-primary: #0A2540;
+  --text-secondary: #425466;
+  --text-tertiary: #8898AA;
+  --text-inverse: #FFFFFF;
+
+  --border-primary: #E3E8EE;
+  --border-secondary: #F0F3F7;
+  --border-focus: #635BFF;
+
+  --accent-primary: #635BFF;
+  --accent-primary-hover: #5851EA;
+  --accent-primary-subtle: rgba(99, 91, 255, 0.08);
+
+  --success: #0E6245;
+  --success-bg: rgba(14, 98, 69, 0.08);
+  --error: #DF1B41;
+  --error-bg: rgba(223, 27, 65, 0.08);
+  --warning: #C47806;
+  --warning-bg: rgba(196, 120, 6, 0.08);
+}
+
+.dark {
+  --bg-primary: #0A2540;
+  --bg-secondary: #0F2E4C;
+  --bg-tertiary: #143558;
+  --bg-elevated: #1A3A5C;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #ADBDCC;
+  --text-tertiary: #6B7C93;
+  --text-inverse: #0A2540;
+
+  --border-primary: #1E4976;
+  --border-secondary: #163B63;
+  --border-focus: #635BFF;
+
+  --accent-primary: #7B73FF;
+  --accent-primary-hover: #8F89FF;
+  --accent-primary-subtle: rgba(123, 115, 255, 0.15);
+
+  --success: #00D4AA;
+  --success-bg: rgba(0, 212, 170, 0.12);
+  --error: #FF6B8A;
+  --error-bg: rgba(255, 107, 138, 0.12);
+  --warning: #FFBB00;
+  --warning-bg: rgba(255, 187, 0, 0.12);
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography utilities */
+.hero-headline {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.section-header {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.body-text {
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.6;
+}
+
+.overline {
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: var(--font-size-overline);
+}
+
+.metric {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Card patterns */
+.stripe-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.stripe-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+}
+
+/* Button patterns */
+.btn-primary {
+  background-color: var(--accent-primary);
+  color: white;
+  border-radius: var(--radius-md);
+  padding: 0.625rem 1.25rem;
+  font-weight: 500;
+  font-size: var(--font-size-body-sm);
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-spring);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  padding: 0.625rem 1.25rem;
+  font-weight: 500;
+  font-size: var(--font-size-body-sm);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--text-tertiary);
+}
+
+/* Shimmer loading */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-tertiary) 25%,
+    var(--bg-secondary) 50%,
+    var(--bg-tertiary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Staggered entrance */
+.stagger-enter > * {
+  animation: fadeUp 0.6s var(--ease-out) both;
+}
+.stagger-enter > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-enter > *:nth-child(2) { animation-delay: 80ms; }
+.stagger-enter > *:nth-child(3) { animation-delay: 160ms; }
+.stagger-enter > *:nth-child(4) { animation-delay: 240ms; }
+.stagger-enter > *:nth-child(5) { animation-delay: 320ms; }
+.stagger-enter > *:nth-child(6) { animation-delay: 400ms; }
+.stagger-enter > *:nth-child(7) { animation-delay: 480ms; }
+.stagger-enter > *:nth-child(8) { animation-delay: 560ms; }
+
+/* Focus styles */
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent-primary-subtle), 0 0 0 1px var(--border-focus);
+  border-color: var(--border-focus);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-tertiary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
