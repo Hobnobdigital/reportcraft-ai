@@ -1,23 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Upload, BarChart3, FileText, Layout } from "lucide-react";
-
-function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    let start: number;
-    const animate = (ts: number) => {
-      if (!start) start = ts;
-      const p = Math.min((ts - start) / 1500, 1);
-      setVal(Math.floor((p === 1 ? 1 : 1 - Math.pow(2, -10 * p)) * end));
-      if (p < 1) requestAnimationFrame(animate);
-    };
-    requestAnimationFrame(animate);
-  }, [end]);
-  return <>{val.toLocaleString()}{suffix}</>;
-}
 
 export function Hero() {
   return (
@@ -51,14 +35,7 @@ export function Hero() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-12 mb-20">
-            {[{ end: 10000, suffix: "+", label: "Datasets analyzed" }, { end: 50, suffix: "ms", label: "Avg response" }, { end: 49, suffix: "/5", label: "User rating" }].map((s, i) => (
-              <div key={i} className="flex flex-col">
-                <span className="metric text-2xl"><Counter end={s.end} suffix={s.suffix} /></span>
-                <span className="text-[13px] mt-1" style={{ color: "var(--text-tertiary)" }}>{s.label}</span>
-              </div>
-            ))}
-          </div>
+          <div className="mb-20" />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 stagger-enter">
