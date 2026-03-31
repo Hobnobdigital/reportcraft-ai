@@ -20,8 +20,8 @@ Respond with JSON (no markdown, no code blocks, just raw JSON):
   },
   "chartCaptions": ["2-3 sentence caption for chart 1", "caption for chart 2", "caption for chart 3"],
   "imagePrompts": [
-    "A photorealistic image of a modern marketing team analyzing data on large screens in a bright office with natural light, professional photography, 4K",
-    "A photorealistic aerial view of a modern city skyline at golden hour representing business growth and opportunity, cinematic lighting, 4K"
+    "Write a vivid, specific prompt for a photorealistic lifestyle image that contextualizes the data story. Be specific about scene, lighting, mood. Examples of good prompts: 'Overhead shot of a marketing team gathered around a conference table covered in printed charts and laptops, warm afternoon light from large windows, candid moment of collaboration, shallow depth of field, editorial photography style' or 'Close-up of hands holding a tablet showing growth charts in a modern glass office, bokeh city lights in background, warm golden hour tones, 4K professional photography'",
+    "Write a DIFFERENT vivid prompt for a second lifestyle image. Could be environmental (city, nature), workspace, or abstract. Examples: 'Aerial drone shot of Vancouver waterfront at sunrise, glass towers reflecting pink and gold light, boats dotting the harbour, cinematic wide angle, 4K' or 'Isometric 3D miniature diorama of a modern analytics office with tiny people at desks, glowing screens showing colorful dashboards, tilt-shift photography'"
   ],
   "keyTakeaways": ["takeaway 1", "takeaway 2", "takeaway 3"]
 }`;

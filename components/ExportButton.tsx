@@ -73,12 +73,12 @@ export function ExportButton({ targetId, suggestedTitle = "Dashboard Report", an
       const prompts = (reportData.imagePrompts || []).slice(0, 2);
 
       for (let i = 0; i < prompts.length; i++) {
-        setGenerationStep(`Generating image ${i + 1} of ${prompts.length}...`);
+        setGenerationStep(`Generating lifestyle image ${i + 1} of ${prompts.length}...`);
         try {
           const imgRes = await fetch("/api/generate-image", {
             method: "POST",
             headers: { "Content-Type": "application/json", "x-access-code": accessCode },
-            body: JSON.stringify({ prompt: prompts[i] }),
+            body: JSON.stringify({ prompt: prompts[i], index: i }),
           });
           if (imgRes.ok) {
             const { url } = await imgRes.json();
