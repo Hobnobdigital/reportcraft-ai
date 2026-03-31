@@ -2,11 +2,6 @@ import { NextResponse } from "next/server";
 import { generateNarrative } from "@/lib/claude";
 
 export async function POST(req: Request) {
-  const accessCode = req.headers.get("x-access-code")?.trim();
-  if (!accessCode || accessCode !== process.env.ACCESS_CODE?.trim()) {
-    return NextResponse.json({ error: "Invalid access code" }, { status: 401 });
-  }
-
   try {
     const body = await req.json();
     const { kpis, charts, insights, columns } = body;

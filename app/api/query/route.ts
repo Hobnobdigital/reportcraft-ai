@@ -24,11 +24,6 @@ Choose the chart type that best visualizes the answer. Always aggregate or filte
 The "insight" field is CRITICAL — it must directly and specifically answer the user's question with real numbers.`;
 
 export async function POST(req: Request) {
-  const accessCode = req.headers.get("x-access-code")?.trim();
-  if (!accessCode || accessCode !== process.env.ACCESS_CODE?.trim()) {
-    return NextResponse.json({ error: "Invalid access code" }, { status: 401 });
-  }
-
   try {
     const { query, data, columns } = await req.json();
     if (!query || !data || !columns) {

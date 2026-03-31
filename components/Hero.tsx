@@ -79,9 +79,7 @@ export function Hero() {
 
         <footer className="mt-24 pt-8" style={{ borderTop: "1px solid var(--border-primary)" }}>
           <p className="text-[13px] font-medium" style={{ color: "var(--text-tertiary)" }}>
-            Built by <span style={{ color: "var(--text-secondary)" }}>Kwame Sarfo-Mensah</span>
-            {" "}&middot;{" "}
-            <a href="https://github.com/kwamesarfo" target="_blank" rel="noopener noreferrer" style={{ color: "var(--stripe-purple)" }}>GitHub</a>
+            Built by <span style={{ color: "var(--text-secondary)" }}>Kwame Adoo</span>
           </p>
         </footer>
       </div>

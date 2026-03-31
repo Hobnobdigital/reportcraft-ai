@@ -57,11 +57,6 @@ async function tryGenerate(token: string, prompt: string, retries = 3): Promise<
 }
 
 export async function POST(req: Request) {
-  const accessCode = req.headers.get("x-access-code")?.trim();
-  if (!accessCode || accessCode !== process.env.ACCESS_CODE?.trim()) {
-    return NextResponse.json({ error: "Invalid access code" }, { status: 401 });
-  }
-
   const token = process.env.REPLICATE_API_TOKEN;
 
   try {

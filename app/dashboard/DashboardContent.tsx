@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Sparkles, PanelLeftClose, PanelLeft, MessageSquare } from "lucide-react";
-import { useAccessCode } from "@/components/AccessCodeProvider";
 import { FileUpload } from "@/components/FileUpload";
 import { TemplateSelector } from "@/components/TemplateSelector";
 import { DataPreview } from "@/components/DataPreview";
@@ -24,7 +23,6 @@ interface QueryResult {
 
 export function DashboardContent() {
   const searchParams = useSearchParams();
-  const { accessCode, isAuthenticated } = useAccessCode();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [queryResults, setQueryResults] = useState<QueryResult[]>([]);
   const [isQuerying, setIsQuerying] = useState(false);
@@ -55,13 +53,13 @@ export function DashboardContent() {
   }, []);
 
   const handleQuery = async (query: string) => {
-    if (!state.parsedData || !accessCode) return;
+    if (!state.parsedData) return;
     setIsQuerying(true);
     setQueryError(null);
     try {
       const res = await fetch("/api/query", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-access-code": accessCode },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query, data: state.parsedData.data, columns: state.parsedData.columns }),
       });
       if (!res.ok) {
@@ -85,12 +83,12 @@ export function DashboardContent() {
   }, [searchParams, handleTemplateSelect]);
 
   const generateDashboard = async () => {
-    if (!state.parsedData || !accessCode) return;
+    if (!state.parsedData) return;
     setState(p => ({ ...p, isAnalyzing: true, error: null, analysis: null, narrative: null }));
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-access-code": accessCode },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: state.parsedData.data, columns: state.parsedData.columns, template: state.activeTemplate || undefined }),
       });
       if (!res.ok) { const err = await res.json(); throw new Error(err.error || "Analysis failed"); }
@@ -99,7 +97,7 @@ export function DashboardContent() {
 
       const nRes = await fetch("/api/narrative", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-access-code": accessCode },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ kpis: analysis.kpis, charts: analysis.charts, insights: analysis.insights, columns: state.parsedData!.columns }),
       });
       if (nRes.ok) { const { narrative } = await nRes.json(); setState(p => ({ ...p, narrative, isGeneratingNarrative: false })); }
@@ -152,7 +150,7 @@ export function DashboardContent() {
                 <ExportButton targetId="dashboard-export" suggestedTitle={suggestedTitle} analysis={state.analysis!} templateName={state.activeTemplate ? templates.find(t => t.id === state.activeTemplate)?.name : undefined} columns={state.parsedData?.columns} /></>
               )}
               {state.parsedData && (
-                <button onClick={generateDashboard} disabled={state.isAnalyzing || !isAuthenticated}
+                <button onClick={generateDashboard} disabled={state.isAnalyzing}
                   className="btn-primary py-2.5 px-5 disabled:opacity-50 disabled:cursor-not-allowed">
                   <Sparkles className="w-4 h-4" />{state.isAnalyzing ? "Analyzing..." : "Generate Dashboard"}
                 </button>
@@ -163,7 +161,7 @@ export function DashboardContent() {
           {/* Query input */}
           {state.parsedData && state.analysis && (
             <div className="flex justify-center mb-8 animate-fadeUp" style={{ animationDelay: "200ms" }}>
-              <QueryInput onQuery={handleQuery} isLoading={isQuerying} disabled={!isAuthenticated} />
+              <QueryInput onQuery={handleQuery} isLoading={isQuerying} disabled={false} />
             </div>
           )}
 

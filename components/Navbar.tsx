@@ -3,15 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { Lock, Unlock, Zap, Sun, Moon } from "lucide-react";
-import { useAccessCode } from "./AccessCodeProvider";
+import { Zap, Sun, Moon } from "lucide-react";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const { isAuthenticated, clearAccessCode } = useAccessCode();
-
   useEffect(() => {
     setMounted(true);
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -59,17 +56,6 @@ export function Navbar() {
             </button>
           )}
 
-          <button
-            onClick={() => { if (isAuthenticated) clearAccessCode(); }}
-            className="w-8 h-8 flex items-center justify-center rounded-md transition-all duration-200"
-            aria-label={isAuthenticated ? "Lock" : "Locked"}
-          >
-            {isAuthenticated ? (
-              <Unlock size={16} style={{ color: "var(--stripe-green)" }} />
-            ) : (
-              <Lock size={16} style={{ color: "var(--text-tertiary)" }} />
-            )}
-          </button>
         </div>
       </div>
     </header>

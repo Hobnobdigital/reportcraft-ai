@@ -4,8 +4,6 @@ import { useState } from "react";
 import { FileText, Loader2 } from "lucide-react";
 import { ReportPreview } from "./ReportPreview";
 import { AnalysisResult } from "@/lib/types";
-import { useAccessCode } from "./AccessCodeProvider";
-
 interface ExportButtonProps {
   targetId: string;
   suggestedTitle?: string;
@@ -25,7 +23,6 @@ interface ReportData {
 }
 
 export function ExportButton({ targetId, suggestedTitle = "Dashboard Report", analysis, templateName, columns }: ExportButtonProps) {
-  const { accessCode } = useAccessCode();
   const [showPreview, setShowPreview] = useState(false);
   const [report, setReport] = useState<ReportData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -34,10 +31,6 @@ export function ExportButton({ targetId, suggestedTitle = "Dashboard Report", an
 
   const generateReport = async () => {
     if (!analysis) return;
-    if (!accessCode) {
-      setError("Please enter your access code first.");
-      return;
-    }
 
     // Open preview immediately with loading state
     setShowPreview(true);
@@ -50,7 +43,7 @@ export function ExportButton({ targetId, suggestedTitle = "Dashboard Report", an
       // Step 1: Generate report content via Claude
       const reportRes = await fetch("/api/report", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "x-access-code": accessCode },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           kpis: analysis.kpis,
           charts: analysis.charts,
@@ -77,7 +70,7 @@ export function ExportButton({ targetId, suggestedTitle = "Dashboard Report", an
         try {
           const imgRes = await fetch("/api/generate-image", {
             method: "POST",
-            headers: { "Content-Type": "application/json", "x-access-code": accessCode },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ prompt: prompts[i], index: i }),
           });
           if (imgRes.ok) {
