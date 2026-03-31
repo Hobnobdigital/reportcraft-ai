@@ -5,125 +5,120 @@ import { ArrowRight, Upload, BarChart3, FileText, Layout } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative min-h-screen overflow-hidden">
-      <div className="mesh-bg"><div className="grid-pattern" /></div>
-      <div className="relative max-w-[1400px] mx-auto px-6 pt-32 pb-20">
-        <div className="max-w-3xl stagger-enter">
-          <div>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-[0.06em] uppercase mb-8"
-              style={{ backgroundColor: "var(--accent-subtle)", color: "var(--stripe-purple)", border: "1px solid rgba(99,91,255,0.15)" }}>
-              AI-Powered Analytics
-            </span>
-          </div>
+    <section className="min-h-screen" style={{ backgroundColor: "#FFFFFF" }}>
+      {/* Subtle gradient mesh on white */}
+      <div className="fixed inset-0 -z-10 pointer-events-none" style={{
+        background: "radial-gradient(ellipse at 20% 50%, rgba(99,91,255,0.04) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(0,212,170,0.03) 0%, transparent 50%), radial-gradient(ellipse at 50% 80%, rgba(0,115,230,0.02) 0%, transparent 50%), #FFFFFF"
+      }} />
 
-          <h1 className="hero-headline text-5xl sm:text-6xl lg:text-7xl mb-6">
-            Upload data.<br />
-            Get an executive dashboard{" "}
-            <span style={{ color: "var(--stripe-purple)" }}>in seconds.</span>
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-6 pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16">
+        {/* ABOVE THE FOLD — Hero content */}
+        <div className="max-w-2xl stagger-enter">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-[0.06em] uppercase mb-5 sm:mb-6"
+            style={{ backgroundColor: "rgba(99,91,255,0.08)", color: "#635BFF", border: "1px solid rgba(99,91,255,0.12)" }}>
+            AI-Powered Analytics
+          </span>
+
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 sm:mb-5" style={{ color: "#0A2540", lineHeight: 1.08, letterSpacing: "-0.03em" }}>
+            Upload data.{" "}
+            <span className="block sm:inline">Get an executive dashboard</span>{" "}
+            <span style={{ color: "#635BFF" }}>in seconds.</span>
           </h1>
 
-          <p className="text-lg mb-10 leading-relaxed max-w-2xl" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-base sm:text-lg mb-6 sm:mb-8 leading-relaxed" style={{ color: "#425466" }}>
             AI-powered data storytelling for marketing teams. No SQL. No Looker. No waiting.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-start gap-4 mb-16">
-            <Link href="/dashboard?template=campaign-performance" className="btn-primary py-3 px-6 text-[15px] rounded-lg">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-start gap-3 sm:gap-4">
+            <Link href="/dashboard?template=campaign-performance"
+              className="btn-primary py-3 px-6 text-[15px] rounded-lg justify-center">
               Try with Sample Data <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/dashboard" className="btn-secondary py-3 px-6 text-[15px] rounded-lg">
+            <Link href="/dashboard"
+              className="btn-secondary py-3 px-6 text-[15px] rounded-lg justify-center">
               <Upload className="w-4 h-4" /> Upload Your Data
             </Link>
           </div>
-
-          <div className="mb-20" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 stagger-enter">
+        {/* FEATURE CARDS */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 mt-16 sm:mt-20 lg:mt-24 stagger-enter">
           {/* Card 1: AI Analysis */}
-          <div className="group relative rounded-2xl overflow-hidden cursor-default"
-            style={{ border: "1px solid var(--border-primary)", transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1)" }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 20px 40px -12px rgba(99,91,255,0.15)"; }}
+          <div className="group relative rounded-2xl overflow-hidden"
+            style={{ backgroundColor: "#FFFFFF", border: "1px solid #E3E8EE", transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1)" }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 32px -8px rgba(99,91,255,0.12)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
-            {/* Top gradient strip */}
-            <div style={{ height: 4, background: "linear-gradient(90deg, #635BFF, #00D4AA)" }} />
-            {/* Decorative background orb */}
-            <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-              style={{ background: "radial-gradient(circle, rgba(99,91,255,0.08) 0%, transparent 70%)" }} />
-            <div className="relative p-7" style={{ backgroundColor: "var(--bg-elevated)" }}>
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                style={{ background: "linear-gradient(135deg, rgba(99,91,255,0.12), rgba(99,91,255,0.04))", border: "1px solid rgba(99,91,255,0.15)" }}>
-                <BarChart3 className="w-6 h-6" style={{ color: "#635BFF" }} />
+            <div style={{ height: 3, background: "linear-gradient(90deg, #635BFF, #00D4AA)" }} />
+            <div className="p-6">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
+                style={{ background: "linear-gradient(135deg, rgba(99,91,255,0.1), rgba(99,91,255,0.03))", border: "1px solid rgba(99,91,255,0.12)" }}>
+                <BarChart3 className="w-5 h-5" style={{ color: "#635BFF" }} />
               </div>
-              <h3 className="text-lg font-semibold mb-2" style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}>AI Analysis</h3>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--text-secondary)" }}>
-                Claude AI identifies KPIs, recommends chart types, and surfaces key insights from your data automatically.
+              <h3 className="text-base font-semibold mb-2" style={{ color: "#0A2540", letterSpacing: "-0.01em" }}>AI Analysis</h3>
+              <p className="text-[13px] leading-relaxed mb-4" style={{ color: "#425466" }}>
+                Claude identifies KPIs, recommends charts, and surfaces insights from your data automatically.
               </p>
-              <div className="flex items-center gap-4 pt-4" style={{ borderTop: "1px solid var(--border-secondary)" }}>
+              <div className="flex flex-wrap items-center gap-2 pt-3" style={{ borderTop: "1px solid #F0F3F7" }}>
                 {["KPI Detection", "Chart Recs", "Insights"].map(tag => (
-                  <span key={tag} className="text-[11px] font-medium px-2 py-1 rounded-full"
-                    style={{ backgroundColor: "var(--accent-subtle)", color: "#635BFF" }}>{tag}</span>
+                  <span key={tag} className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: "rgba(99,91,255,0.06)", color: "#635BFF" }}>{tag}</span>
                 ))}
               </div>
             </div>
           </div>
 
           {/* Card 2: Template Library */}
-          <div className="group relative rounded-2xl overflow-hidden cursor-default"
-            style={{ border: "1px solid var(--border-primary)", transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1)" }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 20px 40px -12px rgba(0,212,170,0.12)"; }}
+          <div className="group relative rounded-2xl overflow-hidden"
+            style={{ backgroundColor: "#FFFFFF", border: "1px solid #E3E8EE", transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1)" }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 32px -8px rgba(0,212,170,0.10)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
-            <div style={{ height: 4, background: "linear-gradient(90deg, #00D4AA, #0073E6)" }} />
-            <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-              style={{ background: "radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%)" }} />
-            <div className="relative p-7" style={{ backgroundColor: "var(--bg-elevated)" }}>
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                style={{ background: "linear-gradient(135deg, rgba(0,212,170,0.12), rgba(0,212,170,0.04))", border: "1px solid rgba(0,212,170,0.15)" }}>
-                <Layout className="w-6 h-6" style={{ color: "#00D4AA" }} />
+            <div style={{ height: 3, background: "linear-gradient(90deg, #00D4AA, #0073E6)" }} />
+            <div className="p-6">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
+                style={{ background: "linear-gradient(135deg, rgba(0,212,170,0.1), rgba(0,212,170,0.03))", border: "1px solid rgba(0,212,170,0.12)" }}>
+                <Layout className="w-5 h-5" style={{ color: "#00D4AA" }} />
               </div>
-              <h3 className="text-lg font-semibold mb-2" style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Template Library</h3>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--text-secondary)" }}>
-                Pre-built marketing templates for campaign performance, funnel analysis, and channel mix reporting.
+              <h3 className="text-base font-semibold mb-2" style={{ color: "#0A2540", letterSpacing: "-0.01em" }}>Template Library</h3>
+              <p className="text-[13px] leading-relaxed mb-4" style={{ color: "#425466" }}>
+                Pre-built marketing templates for campaign performance, funnel analysis, and channel mix.
               </p>
-              {/* Mini template previews */}
-              <div className="flex gap-2 pt-4" style={{ borderTop: "1px solid var(--border-secondary)" }}>
+              <div className="flex gap-2 pt-3" style={{ borderTop: "1px solid #F0F3F7" }}>
                 {["Campaign", "Funnel", "Channel Mix"].map((t, i) => (
-                  <div key={t} className="flex-1 rounded-lg p-2 text-center text-[10px] font-semibold"
-                    style={{ backgroundColor: i === 0 ? "rgba(0,212,170,0.08)" : "var(--bg-secondary)", color: i === 0 ? "#00D4AA" : "var(--text-tertiary)", border: `1px solid ${i === 0 ? "rgba(0,212,170,0.15)" : "var(--border-secondary)"}` }}>{t}</div>
+                  <div key={t} className="flex-1 rounded-lg py-1.5 text-center text-[10px] font-semibold"
+                    style={{ backgroundColor: i === 0 ? "rgba(0,212,170,0.06)" : "#F6F9FC", color: i === 0 ? "#00D4AA" : "#8898AA", border: `1px solid ${i === 0 ? "rgba(0,212,170,0.12)" : "#F0F3F7"}` }}>{t}</div>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Card 3: PDF Export */}
-          <div className="group relative rounded-2xl overflow-hidden cursor-default"
-            style={{ border: "1px solid var(--border-primary)", transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1)" }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; e.currentTarget.style.boxShadow = "0 20px 40px -12px rgba(0,115,230,0.12)"; }}
+          {/* Card 3: Executive Reports */}
+          <div className="group relative rounded-2xl overflow-hidden sm:col-span-2 lg:col-span-1"
+            style={{ backgroundColor: "#FFFFFF", border: "1px solid #E3E8EE", transition: "transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s cubic-bezier(0.16,1,0.3,1)" }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 32px -8px rgba(0,115,230,0.10)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
-            <div style={{ height: 4, background: "linear-gradient(90deg, #0073E6, #635BFF)" }} />
-            <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-              style={{ background: "radial-gradient(circle, rgba(0,115,230,0.08) 0%, transparent 70%)" }} />
-            <div className="relative p-7" style={{ backgroundColor: "var(--bg-elevated)" }}>
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
-                style={{ background: "linear-gradient(135deg, rgba(0,115,230,0.12), rgba(0,115,230,0.04))", border: "1px solid rgba(0,115,230,0.15)" }}>
-                <FileText className="w-6 h-6" style={{ color: "#0073E6" }} />
+            <div style={{ height: 3, background: "linear-gradient(90deg, #0073E6, #635BFF)" }} />
+            <div className="p-6">
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
+                style={{ background: "linear-gradient(135deg, rgba(0,115,230,0.1), rgba(0,115,230,0.03))", border: "1px solid rgba(0,115,230,0.12)" }}>
+                <FileText className="w-5 h-5" style={{ color: "#0073E6" }} />
               </div>
-              <h3 className="text-lg font-semibold mb-2" style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Executive Reports</h3>
-              <p className="text-sm leading-relaxed mb-5" style={{ color: "var(--text-secondary)" }}>
-                Generate Vancity-style PDF reports with AI narratives, lifestyle imagery, and data appendix.
+              <h3 className="text-base font-semibold mb-2" style={{ color: "#0A2540", letterSpacing: "-0.01em" }}>Executive Reports</h3>
+              <p className="text-[13px] leading-relaxed mb-4" style={{ color: "#425466" }}>
+                Generate PDF reports with AI narratives, lifestyle imagery, and data appendix.
               </p>
-              {/* Mini report page preview */}
-              <div className="flex gap-2 pt-4 items-end" style={{ borderTop: "1px solid var(--border-secondary)" }}>
-                {[40, 56, 48, 36].map((h, i) => (
-                  <div key={i} className="flex-1 rounded" style={{ height: h, backgroundColor: i === 0 ? "rgba(0,115,230,0.12)" : "var(--bg-tertiary)", border: `1px solid ${i === 0 ? "rgba(0,115,230,0.15)" : "var(--border-secondary)"}` }} />
+              <div className="flex gap-1.5 pt-3 items-end" style={{ borderTop: "1px solid #F0F3F7" }}>
+                {[32, 44, 38, 28, 48].map((h, i) => (
+                  <div key={i} className="flex-1 rounded-sm" style={{ height: h, backgroundColor: i === 0 ? "rgba(0,115,230,0.1)" : i === 4 ? "rgba(99,91,255,0.08)" : "#F0F3F7" }} />
                 ))}
               </div>
             </div>
           </div>
         </div>
 
-        <footer className="mt-24 pt-8" style={{ borderTop: "1px solid var(--border-primary)" }}>
-          <p className="text-[13px] font-medium" style={{ color: "var(--text-tertiary)" }}>
-            Built by <span style={{ color: "var(--text-secondary)" }}>Kwame Adoo</span>
+        {/* FOOTER */}
+        <footer className="mt-16 sm:mt-20 pt-6 sm:pt-8" style={{ borderTop: "1px solid #E3E8EE" }}>
+          <p className="text-[13px] font-medium" style={{ color: "#8898AA" }}>
+            Built by <span style={{ color: "#425466" }}>Kwame Adoo</span>
           </p>
         </footer>
       </div>

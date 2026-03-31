@@ -112,12 +112,15 @@ export function DashboardContent() {
     : state.fileName ? `${state.fileName.replace(/\.[^.]+$/, "")} Report` : "Dashboard Report";
 
   return (
-    <div className="min-h-screen pt-16 flex relative">
-      <div className="mesh-bg"><div className="grid-pattern" /></div>
+    <div className="min-h-screen pt-16 flex relative" style={{ backgroundColor: "var(--bg-primary)" }}>
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-20 bg-black/30 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
 
-      <aside className="flex-shrink-0 border-r transition-all duration-300 overflow-hidden relative z-10"
-        style={{ width: sidebarOpen ? 320 : 0, borderColor: "var(--border-primary)", backgroundColor: "var(--bg-secondary)" }}>
-        <div className="w-80 h-full overflow-y-auto p-5 space-y-6">
+      <aside className="flex-shrink-0 border-r transition-all duration-300 overflow-hidden z-30 fixed lg:relative h-[calc(100vh-64px)] top-16 left-0"
+        style={{ width: sidebarOpen ? 300 : 0, borderColor: "var(--border-primary)", backgroundColor: "var(--bg-primary)" }}>
+        <div className="w-[300px] h-full overflow-y-auto p-5 space-y-5">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-semibold" style={{ color: "var(--text-primary)", letterSpacing: "-0.01em" }}>Data Source</h2>
             <button onClick={() => setSidebarOpen(false)} className="w-7 h-7 flex items-center justify-center rounded-md transition-colors" style={{ color: "var(--text-tertiary)" }}>
@@ -130,9 +133,9 @@ export function DashboardContent() {
         </div>
       </aside>
 
-      <div className="flex-1 min-w-0 relative z-10">
-        <div className="max-w-[1400px] mx-auto p-6">
-          <div className="flex items-center justify-between mb-6 animate-fadeUp">
+      <div className="flex-1 min-w-0 relative z-10" style={{ marginLeft: sidebarOpen ? 0 : 0 }}>
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-5 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 animate-fadeUp">
             <div className="flex items-center gap-3">
               {!sidebarOpen && (
                 <button onClick={() => setSidebarOpen(true)} className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
