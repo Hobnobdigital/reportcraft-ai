@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, FileText } from "lucide-react";
+import { FileText, Loader2 } from "lucide-react";
 import { ReportPreview } from "./ReportPreview";
 import { AnalysisResult } from "@/lib/types";
 import { useAccessCode } from "./AccessCodeProvider";
@@ -29,12 +29,22 @@ export function ExportButton({ targetId, suggestedTitle = "Dashboard Report", an
   const [showPreview, setShowPreview] = useState(false);
   const [report, setReport] = useState<ReportData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationStep, setGenerationStep] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const generateReport = async () => {
-    if (!analysis || !accessCode) return;
+    if (!analysis) return;
+    if (!accessCode) {
+      setError("Please enter your access code first.");
+      return;
+    }
+
+    // Open preview immediately with loading state
     setShowPreview(true);
     setIsGenerating(true);
     setReport(null);
+    setError(null);
+    setGenerationStep("Analyzing your data and crafting the narrative...");
 
     try {
       // Step 1: Generate report content via Claude
@@ -50,26 +60,36 @@ export function ExportButton({ targetId, suggestedTitle = "Dashboard Report", an
         }),
       });
 
-      if (!reportRes.ok) throw new Error("Report generation failed");
+      if (!reportRes.ok) {
+        const errData = await reportRes.json().catch(() => ({}));
+        throw new Error(errData.error || `Report generation failed (${reportRes.status})`);
+      }
+
       const reportData = await reportRes.json();
 
       // Step 2: Generate lifestyle images via Replicate
+      setGenerationStep("Generating lifestyle imagery for your report...");
       const imageUrls: string[] = [];
-      for (const prompt of (reportData.imagePrompts || []).slice(0, 2)) {
+      const prompts = (reportData.imagePrompts || []).slice(0, 2);
+
+      for (let i = 0; i < prompts.length; i++) {
+        setGenerationStep(`Generating image ${i + 1} of ${prompts.length}...`);
         try {
           const imgRes = await fetch("/api/generate-image", {
             method: "POST",
             headers: { "Content-Type": "application/json", "x-access-code": accessCode },
-            body: JSON.stringify({ prompt }),
+            body: JSON.stringify({ prompt: prompts[i] }),
           });
           if (imgRes.ok) {
             const { url } = await imgRes.json();
             if (url) imageUrls.push(url);
           }
         } catch {
-          // Image generation is non-critical
+          // Image generation is non-critical — continue
         }
       }
+
+      setGenerationStep("Assembling your report...");
 
       setReport({
         title: reportData.title || suggestedTitle,
@@ -82,23 +102,41 @@ export function ExportButton({ targetId, suggestedTitle = "Dashboard Report", an
       });
     } catch (err) {
       console.error("Report generation failed:", err);
+      setError(err instanceof Error ? err.message : "Report generation failed. Please try again.");
     }
     setIsGenerating(false);
+    setGenerationStep("");
   };
 
   return (
     <>
-      <button onClick={generateReport} className="btn-secondary text-sm px-4 py-2" disabled={!analysis}>
-        <FileText className="w-4 h-4" /> Generate Report
+      <button
+        onClick={generateReport}
+        className="btn-primary text-sm px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!analysis || isGenerating}
+      >
+        {isGenerating ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            Generating...
+          </>
+        ) : (
+          <>
+            <FileText className="w-4 h-4" />
+            Generate Report
+          </>
+        )}
       </button>
 
       {analysis && (
         <ReportPreview
           isOpen={showPreview}
-          onClose={() => setShowPreview(false)}
+          onClose={() => { setShowPreview(false); setError(null); }}
           report={report}
           analysis={analysis}
           isGenerating={isGenerating}
+          generationStep={generationStep}
+          error={error}
         />
       )}
     </>
