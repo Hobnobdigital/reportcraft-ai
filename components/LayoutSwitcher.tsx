@@ -3,11 +3,7 @@
 import { LayoutDashboard, Grid3x3, Monitor } from "lucide-react";
 import { LayoutPreset } from "@/lib/types";
 
-interface LayoutSwitcherProps {
-  activeLayout: LayoutPreset;
-  onLayoutChange: (layout: LayoutPreset) => void;
-}
-
+interface LayoutSwitcherProps { activeLayout: LayoutPreset; onLayoutChange: (l: LayoutPreset) => void; }
 const options = [
   { id: "executive" as const, label: "Executive", icon: LayoutDashboard },
   { id: "deep-dive" as const, label: "Deep Dive", icon: Grid3x3 },

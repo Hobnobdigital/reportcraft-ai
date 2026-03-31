@@ -5,9 +5,7 @@ import { Upload, FileSpreadsheet, X } from "lucide-react";
 import { parseFile } from "@/lib/parseData";
 import { ParsedData } from "@/lib/types";
 
-interface FileUploadProps {
-  onDataParsed: (data: ParsedData, fileName: string) => void;
-}
+interface FileUploadProps { onDataParsed: (data: ParsedData, fileName: string) => void; }
 
 export function FileUpload({ onDataParsed }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -18,82 +16,52 @@ export function FileUpload({ onDataParsed }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(async (file: File) => {
-    setError(null);
-    setIsParsing(true);
+    setError(null); setIsParsing(true);
     try {
       const result = await parseFile(file);
       setFileName(file.name);
       setFileInfo({ rows: result.data.length, cols: result.columns.length });
       onDataParsed(result, file.name);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to parse file");
-      setFileName(null);
-      setFileInfo(null);
-    }
+    } catch (err) { setError(err instanceof Error ? err.message : "Failed to parse file"); setFileName(null); setFileInfo(null); }
     setIsParsing(false);
   }, [onDataParsed]);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
-  }, [handleFile]);
-
-  const clearFile = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setFileName(null);
-    setFileInfo(null);
-    setError(null);
-    if (inputRef.current) inputRef.current.value = "";
-  };
-
   return (
     <div className="w-full">
-      <div
-        className="relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200"
-        style={{
-          borderColor: isDragging ? "#635BFF" : error ? "#DF1B41" : "rgba(255,255,255,0.1)",
-          backgroundColor: isDragging ? "rgba(99,91,255,0.08)" : "transparent",
-          cursor: fileName ? "default" : "pointer",
-        }}
-        onDrop={handleDrop}
+      <div className="relative border-2 border-dashed rounded-xl p-6 text-center transition-all duration-200"
+        style={{ borderColor: isDragging ? "var(--stripe-purple)" : error ? "var(--stripe-red)" : "var(--border-primary)", backgroundColor: isDragging ? "var(--accent-subtle)" : "transparent", cursor: fileName ? "default" : "pointer" }}
+        onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
-        onClick={() => !fileName && inputRef.current?.click()}
-      >
+        onClick={() => !fileName && inputRef.current?.click()}>
         <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
         {isParsing ? (
-          <div className="py-4">
-            <div className="w-8 h-8 mx-auto mb-3 rounded-lg shimmer" />
-            <p className="text-sm text-white/50">Parsing file...</p>
-          </div>
+          <div className="py-4"><div className="w-8 h-8 mx-auto mb-3 rounded-lg shimmer" /><p className="text-sm" style={{ color: "var(--text-secondary)" }}>Parsing file...</p></div>
         ) : fileName ? (
           <div className="py-2 flex items-center justify-between px-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#635BFF]/15 border border-[#635BFF]/25">
-                <FileSpreadsheet className="w-5 h-5 text-[#635BFF]" />
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "var(--accent-subtle)" }}>
+                <FileSpreadsheet className="w-5 h-5" style={{ color: "var(--stripe-purple)" }} />
               </div>
               <div className="text-left">
-                <p className="text-sm font-medium text-white/90 truncate max-w-[200px]">{fileName}</p>
-                {fileInfo && <p className="text-xs text-white/40 mt-0.5" style={{ fontVariantNumeric: "tabular-nums" }}>{fileInfo.rows.toLocaleString()} rows &middot; {fileInfo.cols} columns</p>}
+                <p className="text-sm font-medium truncate max-w-[200px]" style={{ color: "var(--text-primary)" }}>{fileName}</p>
+                {fileInfo && <p className="text-xs mt-0.5" style={{ color: "var(--text-tertiary)", fontVariantNumeric: "tabular-nums" }}>{fileInfo.rows.toLocaleString()} rows &middot; {fileInfo.cols} columns</p>}
               </div>
             </div>
-            <button onClick={clearFile} className="w-8 h-8 flex items-center justify-center rounded-md text-white/40 hover:text-white hover:bg-white/5 transition-all duration-150">
-              <X className="w-4 h-4" />
-            </button>
+            <button onClick={(e) => { e.stopPropagation(); setFileName(null); setFileInfo(null); setError(null); if (inputRef.current) inputRef.current.value = ""; }}
+              className="w-8 h-8 flex items-center justify-center rounded-md transition-all duration-150" style={{ color: "var(--text-tertiary)" }}><X className="w-4 h-4" /></button>
           </div>
         ) : (
           <div className="py-4">
-            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-white/5 border border-white/8 flex items-center justify-center">
-              <Upload className="w-5 h-5 text-white/40" />
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: "var(--bg-secondary)" }}>
+              <Upload className="w-5 h-5" style={{ color: "var(--text-tertiary)" }} />
             </div>
-            <p className="text-[15px] font-medium text-white/80 tracking-tight">Drop a CSV or Excel file here</p>
-            <p className="text-sm text-white/40 mt-1">or click to browse</p>
+            <p className="text-[15px] font-medium" style={{ color: "var(--text-primary)" }}>Drop a CSV or Excel file here</p>
+            <p className="text-sm mt-1" style={{ color: "var(--text-tertiary)" }}>or click to browse</p>
           </div>
         )}
       </div>
-      {error && <p className="mt-2 text-xs text-[#DF1B41] font-medium">{error}</p>}
+      {error && <p className="mt-2 text-xs font-medium" style={{ color: "var(--stripe-red)" }}>{error}</p>}
     </div>
   );
 }

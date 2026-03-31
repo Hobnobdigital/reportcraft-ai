@@ -2,8 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================
+   STRIPE DESIGN SYSTEM — Light (default) + Dark mode
+   ======================================== */
+
 :root {
-  /* Typography */
+  /* Typography scale */
   --font-size-hero: clamp(3rem, 5vw, 4.5rem);
   --font-size-h1: clamp(2rem, 3.5vw, 3rem);
   --font-size-h2: clamp(1.5rem, 2.5vw, 2rem);
@@ -13,7 +17,7 @@
   --font-size-caption: 0.75rem;
   --font-size-overline: 0.6875rem;
 
-  /* Spacing */
+  /* Spacing (8px grid) */
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -46,101 +50,129 @@
   --duration-slow: 400ms;
   --duration-slower: 600ms;
 
-  /* Core dark palette */
-  --bg-base: #050510;
-  --bg-surface: rgba(25, 25, 35, 0.4);
-  --bg-elevated: rgba(30, 30, 45, 0.6);
-  --accent: #635BFF;
-  --accent-hover: #524BE0;
-  --accent-glow: rgba(99, 91, 255, 0.4);
-  --cyan: #00D4AA;
-  --blue: #0073E6;
-  --amber: #FFBB00;
-  --red: #DF1B41;
+  /* Stripe brand constants */
+  --stripe-purple: #635BFF;
+  --stripe-purple-hover: #5851EA;
+  --stripe-navy: #0A2540;
+  --stripe-cyan: #00D4AA;
+  --stripe-blue: #0073E6;
+  --stripe-amber: #FFBB00;
+  --stripe-red: #DF1B41;
+  --stripe-green: #0E6245;
+
+  /* ===== LIGHT MODE (default) ===== */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F6F9FC;
+  --bg-tertiary: #F0F3F7;
+  --bg-elevated: #FFFFFF;
+
+  --text-primary: #0A2540;
+  --text-secondary: #425466;
+  --text-tertiary: #8898AA;
+  --text-on-accent: #FFFFFF;
+
+  --border-primary: #E3E8EE;
+  --border-secondary: #F0F3F7;
+  --border-focus: #635BFF;
+
+  --accent-subtle: rgba(99, 91, 255, 0.08);
+  --success-subtle: rgba(14, 98, 69, 0.08);
+  --error-subtle: rgba(223, 27, 65, 0.08);
+  --warning-subtle: rgba(196, 120, 6, 0.08);
+
+  /* Glass panel (light) */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(10, 37, 64, 0.08);
+  --glass-shadow: 0 4px 24px rgba(10, 37, 64, 0.06), 0 1px 2px rgba(10, 37, 64, 0.04);
+  --glass-shadow-hover: 0 8px 32px rgba(10, 37, 64, 0.08), 0 2px 4px rgba(10, 37, 64, 0.04);
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  /* Chart axis/grid */
+  --chart-grid: #E3E8EE;
+  --chart-axis: #8898AA;
+  --tooltip-bg: #0A2540;
+  --tooltip-text: #FFFFFF;
+  --tooltip-label: #ADBDCC;
+
+  /* Trend colors */
+  --trend-up: #0E6245;
+  --trend-up-bg: rgba(14, 98, 69, 0.08);
+  --trend-down: #DF1B41;
+  --trend-down-bg: rgba(223, 27, 65, 0.08);
+
+  /* Mesh background */
+  --mesh-bg: #F6F9FC;
+  --mesh-orb-1: rgba(99, 91, 255, 0.04);
+  --mesh-orb-2: rgba(0, 212, 170, 0.04);
+  --mesh-orb-3: rgba(0, 115, 230, 0.03);
+  --grid-line: rgba(10, 37, 64, 0.03);
 }
 
-/* Base */
+/* ===== DARK MODE ===== */
+.dark {
+  --bg-primary: #050510;
+  --bg-secondary: #0A0A1A;
+  --bg-tertiary: #12122A;
+  --bg-elevated: #0F0F22;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-on-accent: #FFFFFF;
+
+  --border-primary: rgba(255, 255, 255, 0.08);
+  --border-secondary: rgba(255, 255, 255, 0.04);
+  --border-focus: #635BFF;
+
+  --accent-subtle: rgba(99, 91, 255, 0.15);
+  --success-subtle: rgba(0, 212, 170, 0.12);
+  --error-subtle: rgba(223, 27, 65, 0.12);
+  --warning-subtle: rgba(255, 187, 0, 0.12);
+
+  --glass-bg: linear-gradient(145deg, rgba(25, 25, 35, 0.4) 0%, rgba(15, 15, 25, 0.6) 100%);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.6);
+  --glass-shadow-hover: 0 16px 48px -12px rgba(0, 0, 0, 0.7);
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  --chart-grid: rgba(255, 255, 255, 0.05);
+  --chart-axis: rgba(255, 255, 255, 0.4);
+  --tooltip-bg: rgba(15, 15, 25, 0.95);
+  --tooltip-text: #FFFFFF;
+  --tooltip-label: rgba(255, 255, 255, 0.4);
+
+  --trend-up: #10B981;
+  --trend-up-bg: rgba(16, 185, 129, 0.12);
+  --trend-down: #DF1B41;
+  --trend-down-bg: rgba(223, 27, 65, 0.12);
+
+  --mesh-bg: #050510;
+  --mesh-orb-1: rgba(99, 91, 255, 0.08);
+  --mesh-orb-2: rgba(0, 212, 170, 0.05);
+  --mesh-orb-3: rgba(0, 115, 230, 0.04);
+  --grid-line: rgba(255, 255, 255, 0.02);
+}
+
+/* ========================================
+   BASE STYLES
+   ======================================== */
+
 * { box-sizing: border-box; padding: 0; margin: 0; }
 html { scroll-behavior: smooth; }
 
 body {
   font-family: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  background-color: var(--bg-base);
-  color: #ffffff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ========================================
-   GLASSMORPHISM — The real deal
-   ======================================== */
-
-.glass-panel {
-  background: linear-gradient(145deg, rgba(25, 25, 35, 0.4) 0%, rgba(15, 15, 25, 0.6) 100%);
-  backdrop-filter: blur(24px) saturate(150%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-xl);
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
-    0 8px 32px -8px rgba(0, 0, 0, 0.6);
-  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
-}
-
-.glass-panel:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
-    0 16px 48px -12px rgba(0, 0, 0, 0.7);
-}
-
-/* Shimmer top edge on hover */
-.glass-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  pointer-events: none;
-}
-
-.glass-panel:hover::before {
-  opacity: 1;
-}
-
-/* ========================================
-   GRADIENT MESH BACKGROUND
-   ======================================== */
-
-.mesh-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: -1;
-  overflow: hidden;
-  background-color: var(--bg-base);
-  background-image:
-    radial-gradient(circle at 15% 50%, rgba(99, 91, 255, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(0, 212, 170, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 50% 80%, rgba(0, 115, 230, 0.04) 0%, transparent 50%);
-}
-
-.grid-pattern {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(circle at center, black, transparent 80%);
-  -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
+::selection {
+  background: rgba(99, 91, 255, 0.2);
+  color: var(--text-primary);
 }
 
 /* ========================================
@@ -148,20 +180,17 @@ body {
    ======================================== */
 
 .hero-headline {
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.05;
-  background: linear-gradient(to bottom, #ffffff, rgba(255,255,255,0.6));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
 }
 
 .section-header {
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.2;
-  color: rgba(255,255,255,0.95);
+  color: var(--text-primary);
 }
 
 .overline {
@@ -169,14 +198,76 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: var(--font-size-overline);
-  color: rgba(255,255,255,0.4);
+  color: var(--text-tertiary);
 }
 
 .metric {
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  color: var(--text-primary);
+}
+
+/* ========================================
+   GLASS PANEL — works in both modes
+   ======================================== */
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+  transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow-hover), var(--glass-inset);
+}
+
+/* Stripe-style card (simpler, for landing page) */
+.stripe-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 4px rgba(10,37,64,0.06), 0 1px 2px rgba(10,37,64,0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.stripe-card:hover {
+  box-shadow: 0 8px 16px rgba(10,37,64,0.08), 0 4px 8px rgba(10,37,64,0.04);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   MESH BACKGROUND
+   ======================================== */
+
+.mesh-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: -1;
+  background-color: var(--mesh-bg);
+  background-image:
+    radial-gradient(ellipse at 20% 50%, var(--mesh-orb-1) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, var(--mesh-orb-2) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, var(--mesh-orb-3) 0%, transparent 50%);
+}
+
+.grid-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at center, black, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
 }
 
 /* ========================================
@@ -184,10 +275,10 @@ body {
    ======================================== */
 
 .btn-primary {
-  background-color: var(--accent);
-  color: white;
-  border-radius: var(--radius-lg);
-  padding: 0.75rem 1.5rem;
+  background-color: var(--stripe-purple);
+  color: #FFFFFF;
+  border-radius: var(--radius-md);
+  padding: 0.625rem 1.25rem;
   font-weight: 500;
   font-size: var(--font-size-body-sm);
   border: none;
@@ -197,25 +288,23 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  box-shadow: 0 2px 8px -2px var(--accent-glow);
+  box-shadow: 0 2px 4px rgba(99, 91, 255, 0.2);
 }
 
 .btn-primary:hover {
-  background-color: var(--accent-hover);
+  background-color: var(--stripe-purple-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px -4px var(--accent-glow);
+  box-shadow: 0 4px 8px rgba(99, 91, 255, 0.3);
 }
 
-.btn-primary:active {
-  transform: translateY(0) scale(0.98);
-}
+.btn-primary:active { transform: translateY(0); }
 
 .btn-secondary {
-  background-color: rgba(255,255,255,0.06);
-  color: rgba(255,255,255,0.8);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: var(--radius-lg);
-  padding: 0.75rem 1.5rem;
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-md);
+  padding: 0.625rem 1.25rem;
   font-weight: 500;
   font-size: var(--font-size-body-sm);
   cursor: pointer;
@@ -227,14 +316,13 @@ body {
 }
 
 .btn-secondary:hover {
-  background-color: rgba(255,255,255,0.1);
-  color: #ffffff;
-  border-color: rgba(255,255,255,0.2);
+  background-color: var(--bg-secondary);
+  border-color: var(--text-tertiary);
 }
 
 .btn-ghost {
-  background-color: transparent;
-  color: rgba(255,255,255,0.5);
+  background: transparent;
+  color: var(--text-tertiary);
   border: none;
   border-radius: var(--radius-md);
   padding: 0.5rem 1rem;
@@ -247,56 +335,27 @@ body {
   gap: 0.5rem;
 }
 
-.btn-ghost:hover {
-  color: #ffffff;
-  background-color: rgba(255,255,255,0.05);
-}
+.btn-ghost:hover { color: var(--text-primary); background: var(--accent-subtle); }
 
 /* ========================================
    ANIMATIONS
    ======================================== */
 
 .shimmer {
-  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 75%);
+  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease infinite;
 }
 
-@keyframes shimmer {
-  from { background-position: -200% 0; }
-  to { background-position: 200% 0; }
-}
+@keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+.animate-fadeUp { animation: fadeUp 0.6s var(--ease-out) both; }
+.animate-scaleIn { animation: scaleIn 0.3s var(--ease-out) both; }
 
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 91, 255, 0.4); }
-  50% { box-shadow: 0 0 0 8px rgba(99, 91, 255, 0); }
-}
-
-@keyframes gradient-shift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Staggered entrance */
-.stagger-enter > * {
-  animation: fadeUp 0.7s var(--ease-out) both;
-}
+.stagger-enter > * { animation: fadeUp 0.6s var(--ease-out) both; }
 .stagger-enter > *:nth-child(1) { animation-delay: 0ms; }
 .stagger-enter > *:nth-child(2) { animation-delay: 80ms; }
 .stagger-enter > *:nth-child(3) { animation-delay: 160ms; }
@@ -304,24 +363,24 @@ body {
 .stagger-enter > *:nth-child(5) { animation-delay: 320ms; }
 .stagger-enter > *:nth-child(6) { animation-delay: 400ms; }
 
-/* Focus styles */
+/* ========================================
+   FORM ELEMENTS
+   ======================================== */
+
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: var(--accent) !important;
-  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.2);
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px rgba(99, 91, 255, 0.15);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+/* ========================================
+   SEGMENTED CONTROL
+   ======================================== */
 
-/* Segmented control */
 .segmented-control {
   display: inline-flex;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-primary);
   border-radius: var(--radius-lg);
   padding: 3px;
   gap: 2px;
@@ -335,31 +394,25 @@ input:focus, textarea:focus, select:focus {
   border: none;
   cursor: pointer;
   transition: all var(--duration-fast) var(--ease-out);
-  color: rgba(255,255,255,0.4);
+  color: var(--text-tertiary);
   background: transparent;
 }
 
 .segmented-control button.active {
-  background: rgba(255,255,255,0.1);
-  color: #ffffff;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  background: var(--bg-primary);
+  color: var(--stripe-purple);
+  box-shadow: 0 1px 3px rgba(10,37,64,0.08);
 }
 
 .segmented-control button:hover:not(.active) {
-  color: rgba(255,255,255,0.7);
-  background: rgba(255,255,255,0.03);
+  color: var(--text-secondary);
 }
 
-/* Recharts dark theme overrides */
-.recharts-cartesian-axis-tick-value {
-  fill: rgba(255,255,255,0.4) !important;
-  font-size: 11px !important;
-  font-weight: 500 !important;
-  font-family: 'Geist', sans-serif !important;
-}
+/* ========================================
+   SCROLLBAR
+   ======================================== */
 
-/* Selection */
-::selection {
-  background: rgba(99, 91, 255, 0.3);
-  color: #fff;
-}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--text-tertiary); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }

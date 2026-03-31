@@ -8,6 +8,7 @@ import "@fontsource/geist-sans/800.css";
 import "@fontsource/geist-mono/400.css";
 import "@fontsource/geist-mono/700.css";
 import "./globals.css";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { AccessCodeProvider } from "@/components/AccessCodeProvider";
 import { AccessCodeModal } from "@/components/AccessCodeModal";
 import { Navbar } from "@/components/Navbar";
@@ -19,16 +20,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23635BFF%22/><text x=%2216%22 y=%2222%22 font-size=%2218%22 fill=%22white%22 text-anchor=%22middle%22 font-weight=%22700%22 font-family=%22sans-serif%22>R</text></svg>" />
       </head>
       <body>
-        <AccessCodeProvider>
-          <Navbar />
-          <main>{children}</main>
-          <AccessCodeModal />
-        </AccessCodeProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
+          <AccessCodeProvider>
+            <Navbar />
+            <main>{children}</main>
+            <AccessCodeModal />
+          </AccessCodeProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

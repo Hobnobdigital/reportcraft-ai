@@ -3,23 +3,25 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const QUERY_SYSTEM_PROMPT = `You are a data visualization expert. Given a user's natural language question about a dataset, generate a chart configuration that answers their question.
+const QUERY_SYSTEM_PROMPT = `You are a data analyst expert. Given a user's natural language question about a dataset, you must:
 
-You will receive the dataset columns, sample data, and the user's question.
+1. ANSWER the question directly in plain English with specific numbers from the data
+2. Generate a chart configuration that visualizes the answer
 
 Respond ONLY with valid JSON matching this schema:
 {
+  "insight": "2-3 sentence direct answer to the user's question with specific numbers and percentages. Be authoritative and precise.",
   "type": "bar" | "line" | "area" | "pie" | "composed",
-  "title": "descriptive chart title answering the question",
+  "title": "descriptive chart title",
   "xKey": "column for x-axis",
   "yKeys": ["column(s) for y-axis"],
   "colors": ["hex colors from: #635BFF, #00D4AA, #0073E6, #FFBB00, #DF1B41, #8B5CF6"],
-  "data": [the relevant data rows],
-  "insight": "1-2 sentence insight answering the user's question with specific numbers"
+  "data": [the relevant data rows, aggregated/filtered as needed to answer the question]
 }
 
-Choose the chart type that best answers the question. Aggregate or filter the data as needed.
-Do not include any text outside the JSON. Do not wrap in markdown code blocks.`;
+Choose the chart type that best visualizes the answer. Always aggregate or filter data as needed.
+The "insight" field is CRITICAL — it must directly and specifically answer the user's question with real numbers.
+Do not include any text outside the JSON.`;
 
 export async function POST(req: Request) {
   const accessCode = req.headers.get("x-access-code")?.trim();
@@ -29,7 +31,6 @@ export async function POST(req: Request) {
 
   try {
     const { query, data, columns } = await req.json();
-
     if (!query || !data || !columns) {
       return NextResponse.json({ error: "Missing query, data, or columns" }, { status: 400 });
     }
@@ -49,12 +50,10 @@ ${JSON.stringify(data.slice(0, 50))}`,
     });
 
     const textBlock = response.content.find((b) => b.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
-      throw new Error("No response from Claude");
-    }
+    if (!textBlock || textBlock.type !== "text") throw new Error("No response");
 
-    const chart = JSON.parse(textBlock.text);
-    return NextResponse.json(chart);
+    const result = JSON.parse(textBlock.text);
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Query error:", error);
     return NextResponse.json({ error: "Query failed" }, { status: 500 });

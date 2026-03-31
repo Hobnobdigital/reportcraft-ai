@@ -1,69 +1,106 @@
 "use client";
 
 import { useState } from "react";
-import { Download } from "lucide-react";
-import { ExportModal } from "./ExportModal";
-import { ExportOptions } from "@/lib/types";
+import { Download, FileText } from "lucide-react";
+import { ReportPreview } from "./ReportPreview";
+import { AnalysisResult } from "@/lib/types";
+import { useAccessCode } from "./AccessCodeProvider";
 
 interface ExportButtonProps {
   targetId: string;
   suggestedTitle?: string;
+  analysis?: AnalysisResult;
+  templateName?: string;
+  columns?: string[];
 }
 
-export function ExportButton({ targetId, suggestedTitle = "Dashboard Report" }: ExportButtonProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
+interface ReportData {
+  title: string;
+  subtitle: string;
+  date: string;
+  executiveSummary: { overview: string; keyFindings: string; recommendations: string };
+  chartCaptions: string[];
+  imageUrls: string[];
+  keyTakeaways: string[];
+}
 
-  const handleExport = async (options: ExportOptions) => {
-    setIsExporting(true);
+export function ExportButton({ targetId, suggestedTitle = "Dashboard Report", analysis, templateName, columns }: ExportButtonProps) {
+  const { accessCode } = useAccessCode();
+  const [showPreview, setShowPreview] = useState(false);
+  const [report, setReport] = useState<ReportData | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const generateReport = async () => {
+    if (!analysis || !accessCode) return;
+    setShowPreview(true);
+    setIsGenerating(true);
+    setReport(null);
+
     try {
-      const element = document.getElementById(targetId);
-      if (!element) return;
+      // Step 1: Generate report content via Claude
+      const reportRes = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-access-code": accessCode },
+        body: JSON.stringify({
+          kpis: analysis.kpis,
+          charts: analysis.charts,
+          insights: analysis.insights,
+          columns,
+          templateName,
+        }),
+      });
 
-      const html2canvas = (await import("html2canvas")).default;
-      const jsPDF = (await import("jspdf")).default;
+      if (!reportRes.ok) throw new Error("Report generation failed");
+      const reportData = await reportRes.json();
 
-      const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: "#050510", logging: false });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [canvas.width + 120, canvas.height + 200] });
-
-      const date = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-
-      // White background for PDF
-      pdf.setFillColor(255, 255, 255);
-      pdf.rect(0, 0, canvas.width + 120, canvas.height + 200, "F");
-
-      if (options.includeCover) {
-        pdf.setFillColor(99, 91, 255);
-        pdf.rect(60, 50, 4, 30, "F");
-        pdf.setFontSize(24);
-        pdf.setTextColor(10, 37, 64);
-        pdf.text(options.title, 74, 72);
-        pdf.setFontSize(11);
-        pdf.setTextColor(136, 152, 170);
-        pdf.text(date, 74, 92);
-        pdf.text("Prepared by ReportCraft AI", canvas.width + 60, 72, { align: "right" });
+      // Step 2: Generate lifestyle images via Replicate
+      const imageUrls: string[] = [];
+      for (const prompt of (reportData.imagePrompts || []).slice(0, 2)) {
+        try {
+          const imgRes = await fetch("/api/generate-image", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-access-code": accessCode },
+            body: JSON.stringify({ prompt }),
+          });
+          if (imgRes.ok) {
+            const { url } = await imgRes.json();
+            if (url) imageUrls.push(url);
+          }
+        } catch {
+          // Image generation is non-critical
+        }
       }
 
-      const yOffset = options.includeCover ? 120 : 60;
-      pdf.addImage(imgData, "PNG", 60, yOffset, canvas.width, canvas.height);
-      pdf.setFontSize(9);
-      pdf.setTextColor(136, 152, 170);
-      pdf.text(date, 60, canvas.height + yOffset + 40);
-      pdf.save(`${options.title.replace(/\s+/g, "-").toLowerCase()}-${Date.now()}.pdf`);
-    } catch (error) {
-      console.error("Export failed:", error);
+      setReport({
+        title: reportData.title || suggestedTitle,
+        subtitle: reportData.subtitle || "",
+        date: reportData.date || new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+        executiveSummary: reportData.executiveSummary || { overview: "", keyFindings: "", recommendations: "" },
+        chartCaptions: reportData.chartCaptions || [],
+        imageUrls,
+        keyTakeaways: reportData.keyTakeaways || [],
+      });
+    } catch (err) {
+      console.error("Report generation failed:", err);
     }
-    setIsExporting(false);
-    setIsModalOpen(false);
+    setIsGenerating(false);
   };
 
   return (
     <>
-      <button onClick={() => setIsModalOpen(true)} className="btn-secondary text-sm px-4 py-2">
-        <Download className="w-4 h-4" /> Export Report
+      <button onClick={generateReport} className="btn-secondary text-sm px-4 py-2" disabled={!analysis}>
+        <FileText className="w-4 h-4" /> Generate Report
       </button>
-      <ExportModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onExport={handleExport} isExporting={isExporting} suggestedTitle={suggestedTitle} />
+
+      {analysis && (
+        <ReportPreview
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+          report={report}
+          analysis={analysis}
+          isGenerating={isGenerating}
+        />
+      )}
     </>
   );
 }
