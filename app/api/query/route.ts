@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { parseClaudeJSON } from "@/lib/parseJSON";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -8,7 +9,7 @@ const QUERY_SYSTEM_PROMPT = `You are a data analyst expert. Given a user's natur
 1. ANSWER the question directly in plain English with specific numbers from the data
 2. Generate a chart configuration that visualizes the answer
 
-Respond ONLY with valid JSON matching this schema:
+Respond with JSON matching this schema (no markdown, no code blocks, just raw JSON):
 {
   "insight": "2-3 sentence direct answer to the user's question with specific numbers and percentages. Be authoritative and precise.",
   "type": "bar" | "line" | "area" | "pie" | "composed",
@@ -20,8 +21,7 @@ Respond ONLY with valid JSON matching this schema:
 }
 
 Choose the chart type that best visualizes the answer. Always aggregate or filter data as needed.
-The "insight" field is CRITICAL — it must directly and specifically answer the user's question with real numbers.
-Do not include any text outside the JSON.`;
+The "insight" field is CRITICAL — it must directly and specifically answer the user's question with real numbers.`;
 
 export async function POST(req: Request) {
   const accessCode = req.headers.get("x-access-code")?.trim();
@@ -52,10 +52,10 @@ ${JSON.stringify(data.slice(0, 50))}`,
     const textBlock = response.content.find((b) => b.type === "text");
     if (!textBlock || textBlock.type !== "text") throw new Error("No response");
 
-    const result = JSON.parse(textBlock.text);
+    const result = parseClaudeJSON(textBlock.text);
     return NextResponse.json(result);
   } catch (error) {
     console.error("Query error:", error);
-    return NextResponse.json({ error: "Query failed" }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Query failed" }, { status: 500 });
   }
 }

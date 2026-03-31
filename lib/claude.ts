@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { AnalysisResult } from "./types";
+import { parseClaudeJSON } from "./parseJSON";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -74,7 +75,7 @@ ${dataStr}`;
     throw new Error("No text response from Claude");
   }
 
-  const parsed = JSON.parse(textBlock.text) as AnalysisResult;
+  const parsed = parseClaudeJSON<AnalysisResult>(textBlock.text);
   return parsed;
 }
 

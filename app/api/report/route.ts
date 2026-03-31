@@ -1,32 +1,27 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { parseClaudeJSON } from "@/lib/parseJSON";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const REPORT_SYSTEM_PROMPT = `You are a senior executive report writer creating a Vancity-style annual report for marketing data. Write compelling, data-driven executive narratives.
 
-Given dashboard data (KPIs, charts, insights), generate a complete report structure:
+Given dashboard data (KPIs, charts, insights), generate a complete report structure.
 
-1. COVER: A compelling report title and subtitle based on the data context
-2. EXECUTIVE SUMMARY: 3 paragraphs (Overview, Key Findings, Recommendations) — 300 words total, executive tone, specific numbers
-3. SECTION NARRATIVES: For each chart, write a 2-3 sentence analytical caption explaining what the chart shows and why it matters
-4. IMAGE PROMPTS: For 2 lifestyle/contextual images that would enhance the data storytelling. These should be photorealistic scenes related to the business context (e.g., marketing team in a modern office, data analytics on screens, business meeting). Each prompt should be detailed, specifying lighting, composition, and mood.
-5. KEY TAKEAWAYS: 3-4 bullet points summarizing the most important findings
-
-Respond with valid JSON:
+Respond with JSON (no markdown, no code blocks, just raw JSON):
 {
   "title": "Report Title",
   "subtitle": "One-line subtitle",
   "date": "Month Year",
   "executiveSummary": {
-    "overview": "paragraph 1",
-    "keyFindings": "paragraph 2",
-    "recommendations": "paragraph 3"
+    "overview": "High-level paragraph about what the data shows",
+    "keyFindings": "Specific patterns, numbers, and trends",
+    "recommendations": "2-3 actionable next steps"
   },
-  "chartCaptions": ["caption for chart 1", "caption for chart 2", "caption for chart 3"],
+  "chartCaptions": ["2-3 sentence caption for chart 1", "caption for chart 2", "caption for chart 3"],
   "imagePrompts": [
-    "Detailed photorealistic image prompt 1 for lifestyle/contextual image",
-    "Detailed photorealistic image prompt 2 for lifestyle/contextual image"
+    "A photorealistic image of a modern marketing team analyzing data on large screens in a bright office with natural light, professional photography, 4K",
+    "A photorealistic aerial view of a modern city skyline at golden hour representing business growth and opportunity, cinematic lighting, 4K"
   ],
   "keyTakeaways": ["takeaway 1", "takeaway 2", "takeaway 3"]
 }`;
@@ -59,10 +54,10 @@ Insights: ${JSON.stringify(insights)}`,
     const textBlock = response.content.find((b) => b.type === "text");
     if (!textBlock || textBlock.type !== "text") throw new Error("No response");
 
-    const report = JSON.parse(textBlock.text);
+    const report = parseClaudeJSON(textBlock.text);
     return NextResponse.json(report);
   } catch (error) {
     console.error("Report generation error:", error);
-    return NextResponse.json({ error: "Report generation failed" }, { status: 500 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Report generation failed" }, { status: 500 });
   }
 }

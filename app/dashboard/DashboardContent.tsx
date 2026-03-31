@@ -28,6 +28,7 @@ export function DashboardContent() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [queryResults, setQueryResults] = useState<QueryResult[]>([]);
   const [isQuerying, setIsQuerying] = useState(false);
+  const [queryError, setQueryError] = useState<string | null>(null);
 
   const [state, setState] = useState<DashboardState>({
     parsedData: null, analysis: null, narrative: null,
@@ -56,16 +57,22 @@ export function DashboardContent() {
   const handleQuery = async (query: string) => {
     if (!state.parsedData || !accessCode) return;
     setIsQuerying(true);
+    setQueryError(null);
     try {
       const res = await fetch("/api/query", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-access-code": accessCode },
         body: JSON.stringify({ query, data: state.parsedData.data, columns: state.parsedData.columns }),
       });
-      if (!res.ok) throw new Error("Query failed");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Query failed (${res.status})`);
+      }
       const result = await res.json();
-      setQueryResults(prev => [...prev, { chart: result as ChartConfig, answer: result.insight || "", query }]);
-    } catch (err) { console.error(err); }
+      setQueryResults(prev => [...prev, { chart: result as ChartConfig, answer: result.insight || "Analysis complete — see the chart below.", query }]);
+    } catch (err) {
+      setQueryError(err instanceof Error ? err.message : "Query failed. Please try again.");
+    }
     setIsQuerying(false);
   };
 
@@ -160,29 +167,41 @@ export function DashboardContent() {
             </div>
           )}
 
-          {/* Query results — conversation style */}
+          {/* Query error */}
+          {queryError && (
+            <div className="flex justify-center mb-4">
+              <div className="max-w-2xl w-full p-3 rounded-lg text-sm animate-fadeUp" style={{ backgroundColor: "var(--error-subtle)", border: "1px solid rgba(223,27,65,0.2)", color: "var(--stripe-red)" }}>
+                {queryError}
+              </div>
+            </div>
+          )}
+
+          {/* Query results — prominent answer cards */}
           {queryResults.length > 0 && (
-            <div className="mb-8 space-y-4">
+            <div className="mb-8 space-y-6">
               {queryResults.map((qr, i) => (
-                <div key={i} className="animate-fadeUp">
-                  {/* User question */}
-                  <div className="flex items-start gap-3 mb-3">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "var(--bg-tertiary)" }}>
-                      <MessageSquare size={14} style={{ color: "var(--text-tertiary)" }} />
+                <div key={i} className="glass-panel p-6 animate-fadeUp">
+                  {/* Question badge */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <MessageSquare size={16} style={{ color: "var(--stripe-purple)" }} />
+                    <span className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{qr.query}</span>
+                  </div>
+
+                  {/* AI Answer — prominent card */}
+                  <div className="rounded-xl p-5 mb-5" style={{ backgroundColor: "var(--accent-subtle)", border: "1px solid rgba(99,91,255,0.15)" }}>
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "linear-gradient(135deg, #635BFF, #00D4AA)" }}>
+                        <Sparkles size={16} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.08em] mb-2" style={{ color: "var(--stripe-purple)" }}>AI Answer</p>
+                        <p className="text-[15px] leading-relaxed font-medium" style={{ color: "var(--text-primary)" }}>{qr.answer}</p>
+                      </div>
                     </div>
-                    <p className="text-sm font-medium pt-1" style={{ color: "var(--text-primary)" }}>{qr.query}</p>
                   </div>
-                  {/* AI answer */}
-                  <div className="flex items-start gap-3 mb-3 ml-10">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "var(--accent-subtle)" }}>
-                      <Sparkles size={14} style={{ color: "var(--stripe-purple)" }} />
-                    </div>
-                    <p className="text-sm leading-relaxed pt-1" style={{ color: "var(--text-secondary)" }}>{qr.answer}</p>
-                  </div>
-                  {/* Chart */}
-                  <div className="ml-10">
-                    <ChartCard chart={qr.chart} index={0} />
-                  </div>
+
+                  {/* Chart visualization */}
+                  <ChartCard chart={qr.chart} index={0} />
                 </div>
               ))}
             </div>
