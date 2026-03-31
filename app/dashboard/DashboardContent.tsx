@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { Sparkles, PanelLeftClose, PanelLeft, MessageSquare } from "lucide-react";
+import { Sparkles, PanelLeftClose, PanelLeft, MessageSquare, BarChart3, FileText } from "lucide-react";
 import { FileUpload } from "@/components/FileUpload";
 import { TemplateSelector } from "@/components/TemplateSelector";
 import { DataPreview } from "@/components/DataPreview";
@@ -215,12 +215,35 @@ export function DashboardContent() {
           {state.analysis && <DashboardGrid analysis={state.analysis} narrative={state.narrative} layout={state.layout} />}
 
           {!state.parsedData && !state.isAnalyzing && (
-            <div className="flex flex-col items-center justify-center py-24 text-center animate-fadeUp">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5" style={{ backgroundColor: "var(--accent-subtle)" }}>
-                <Sparkles className="w-7 h-7" style={{ color: "var(--stripe-purple)" }} />
+            <div className="flex flex-col items-center justify-center py-20 text-center animate-fadeUp">
+              {/* Animated gradient icon */}
+              <div className="relative mb-8">
+                <div className="w-20 h-20 rounded-3xl flex items-center justify-center"
+                  style={{ background: "linear-gradient(135deg, rgba(99,91,255,0.1), rgba(0,212,170,0.08))", border: "1px solid rgba(99,91,255,0.12)" }}>
+                  <Sparkles className="w-8 h-8" style={{ color: "#635BFF" }} />
+                </div>
+                {/* Decorative orbit rings */}
+                <div className="absolute -inset-4 rounded-full border border-dashed" style={{ borderColor: "rgba(99,91,255,0.08)", animation: "spin 20s linear infinite" }} />
+                <div className="absolute -inset-8 rounded-full border border-dashed" style={{ borderColor: "rgba(0,212,170,0.05)", animation: "spin 30s linear infinite reverse" }} />
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
               </div>
-              <h2 className="text-lg font-semibold mb-2" style={{ color: "var(--text-primary)" }}>Ready to analyze</h2>
-              <p className="text-sm max-w-sm" style={{ color: "var(--text-tertiary)" }}>Upload a CSV or Excel file, or select a template from the sidebar to get started.</p>
+              <h2 className="text-2xl font-bold mb-3" style={{ color: "var(--text-primary)", letterSpacing: "-0.02em" }}>Ready to analyze</h2>
+              <p className="text-sm max-w-md mb-8 leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
+                Upload a CSV or Excel file, or select a template from the sidebar to generate AI-powered dashboards and executive reports.
+              </p>
+              {/* Feature hints */}
+              <div className="flex items-center gap-6">
+                {[
+                  { icon: BarChart3, label: "Auto-detect KPIs" },
+                  { icon: MessageSquare, label: "Ask questions" },
+                  { icon: FileText, label: "Generate reports" },
+                ].map(({ icon: Icon, label }) => (
+                  <div key={label} className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ backgroundColor: "var(--bg-secondary)", border: "1px solid var(--border-secondary)" }}>
+                    <Icon size={14} style={{ color: "#635BFF" }} />
+                    <span className="text-[12px] font-medium" style={{ color: "var(--text-secondary)" }}>{label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
